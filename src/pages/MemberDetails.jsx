@@ -28,6 +28,7 @@ export default function MemberDetails() {
   };
 
 
+
   if (!member) return <p className="p-4">Loading...</p>;
 
   return (

@@ -36,11 +36,11 @@ export default function Login() {
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-sm text-black mb-1">Email</label>
+            <label className="block mb-1 text-gray-700 font-medium text-base">Email</label>
             <input
               type="email"
               placeholder="Enter Your Email"
-              className="w-full px-3 py-2 border-1 border-gray-300 rounded-lg focus:outline-none focus:ring"
+              className="w-full px-4 border-[2px] border-gray-300 rounded-[10px] h-12 focus:outline-none focus:ring"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -48,12 +48,12 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="block text-sm text-black mb-1">Password</label>
+            <label className="block mb-1 text-gray-700 font-medium text-base">Password</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Enter Password"
-                className="w-full px-3 py-2 border-1 border-gray-300 rounded-lg focus:outline-none focus:ring pr-10"
+                className="w-full px-4 border-[2px] border-gray-300 rounded-[10px] h-12 focus:outline-none focus:ring"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -61,7 +61,7 @@ export default function Login() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-2 top-2 text-gray-500"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -72,14 +72,14 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800"
+            className="w-full bg-black text-white px-4 h-12 rounded-[10px] hover:bg-gray-800"
           >
             Sign In
           </button>
         </form>
 
-        <p className="text-xs text-gray-500 text-center mt-6">
-          Powered by <a href="#" className="text-blue-500 underline">Our Team</a>
+        <p className="text-gray-500 text-center mt-6 font-medium text-base">
+          Powered by <a href="#" className="text-blue-500">Our Team</a>
         </p>
       </div>
     </div>

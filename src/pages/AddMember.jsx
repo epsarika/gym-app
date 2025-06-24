@@ -3,21 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
 import { addMonths, format } from 'date-fns';
 
+
 export default function AddMember() {
   const [form, setForm] = useState({
     name: '',
     phone: '',
     email: '',
+    place: '',
     plan: '1month',
     start_date: new Date().toISOString().split('T')[0],
     notes: '',
   });
 
   const [calculatedEndDate, setCalculatedEndDate] = useState('');
-  const [formFields, setFormFields] = useState([]);
-  const [customData, setCustomData] = useState({});
   const [gymProfile, setGymProfile] = useState(null);
-
   const navigate = useNavigate();
 
   const calculateEndDate = (startDate, plan) => {
@@ -37,11 +36,9 @@ export default function AddMember() {
     setCalculatedEndDate(format(result, 'yyyy-MM-dd'));
   }, [form.plan, form.start_date]);
 
-
   useEffect(() => {
     const fetchProfile = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-
       const { data: profile, error } = await supabase
         .from('gym_profiles')
         .select('*')
@@ -52,46 +49,33 @@ export default function AddMember() {
         alert('Failed to load gym profile: ' + error.message);
       } else {
         setGymProfile(profile);
-        setFormFields(profile.form_fields || []);
       }
     };
 
     fetchProfile();
   }, []);
 
-
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-
-  const handleCustomChange = (e, field) => {
-    setCustomData({ ...customData, [field]: e.target.value });
-  };
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    const {
-      data: { user }
-    } = await supabase.auth.getUser();
-
-    const { error } = await supabase.from('members').insert([
-      {
-        user_id: user.id,
-        gym_id: gymProfile.id,
-        gym_name: gymProfile.gym_name,
-        name: form.name,
-        phone: form.phone,
-        email: form.email,
-        plan: form.plan,
-        start_date: form.start_date,
-        end_date: calculatedEndDate,
-        notes: form.notes,
-        custom_data: customData,
-      },
-    ]);
+    const { error } = await supabase.from('members').insert([{
+      user_id: user.id,
+      gym_id: gymProfile.id,
+      gym_name: gymProfile.gym_name,
+      name: form.name,
+      phone: form.phone,
+      email: form.email,
+      place: form.place,
+      plan: form.plan,
+      start_date: form.start_date,
+      end_date: calculatedEndDate,
+      notes: form.notes,
+    }]);
 
     if (error) {
       alert('Error adding member: ' + error.message);
@@ -101,97 +85,147 @@ export default function AddMember() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Add New Member</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          name="name"
-          type="text"
-          placeholder="Name"
-          required
-          value={form.name}
-          onChange={handleChange}
-          className="w-full border px-3 py-2 rounded"
-        />
-
-        <input
-          name="phone"
-          type="text"
-          placeholder="Phone"
-          required
-          value={form.phone}
-          onChange={handleChange}
-          className="w-full border px-3 py-2 rounded"
-        />
-
-        <input
-          name="email"
-          type="email"
-          placeholder="Email (optional)"
-          value={form.email}
-          onChange={handleChange}
-          className="w-full border px-3 py-2 rounded"
-        />
-
-        <select
-          name="plan"
-          value={form.plan}
-          onChange={handleChange}
-          className="w-full border px-3 py-2 rounded"
-        >
-          <option value="1month">1 Month</option>
-          <option value="2months">2 Months</option>
-          <option value="3months">3 Months</option>
-          <option value="6months">6 Months</option>
-          <option value="1year">1 Year</option>
-        </select>
-
-        <input
-          name="start_date"
-          type="date"
-          value={form.start_date}
-          onChange={handleChange}
-          className="w-full border px-3 py-2 rounded"
-        />
-
-        {/* Display auto-calculated end_date */}
-        <input
-          type="text"
-          value={calculatedEndDate}
-          readOnly
-          className="w-full border px-3 py-2 rounded bg-gray-100 text-gray-600"
-        />
-
-        <textarea
-          name="notes"
-          placeholder="Notes (optional)"
-          value={form.notes}
-          onChange={handleChange}
-          className="w-full border px-3 py-2 rounded"
-        />
-
-        {formFields.length > 0 && (
-          <div className="space-y-2">
-            {formFields.map((field) => (
-              <input
-                key={field.label}
-                type={field.type || 'text'}
-                placeholder={field.label}
-                value={customData[field.label] || ''}
-                onChange={(e) => handleCustomChange(e, field.label)}
-                className="w-full border px-3 py-2 rounded"
-              />
-            ))}
-          </div>
-        )}
-
-
+    <div className="max-w-sm mx-auto p-4 text-sm">
+      <div className="flex justify-between items-center mb-4">
         <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          onClick={() => navigate('/')}
+          className="p-1 hover:bg-gray-100 rounded"
         >
-          Add Member
+          <img src="/x.svg" alt="Close" className="w-5 h-5" />
         </button>
+
+        <h2 className="text-lg font-semibold">Add Member</h2>
+        <button
+          onClick={handleSubmit}
+          className="bg-black text-white px-3 h-[36px] rounded-[10px]"
+        >
+          <div className='flex items-center gap-1'>
+          <img src="/save.svg" alt="Save" className="w-4 h-4" />
+          <span>Save</span>
+          </div>
+        </button>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-[5px]">
+        <div>
+          <label className="block mb-1 text-gray-700 font-medium text-base">Name</label>
+          <input
+            name="name"
+            type="text"
+            placeholder="Enter Your Name"
+            required
+            value={form.name}
+            onChange={handleChange}
+            className="w-full px-4 border-[2px] border-gray-300 rounded-[10px] h-12 focus:outline-none focus:ring"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1 text-gray-700 font-medium text-base">Phone</label>
+          <input
+            name="phone"
+            type="text"
+            placeholder="Enter Phone Number"
+            required
+            value={form.phone}
+            onChange={handleChange}
+            className="w-full px-4 border-[2px] border-gray-300 rounded-[10px] h-12 focus:outline-none focus:ring"
+          />
+          <p className="text-xs text-gray-400 mt-1">
+            This number will be used to send reminders
+          </p>
+        </div>
+
+        <div>
+          <label className="block mb-1 text-gray-700 font-medium text-base">Email</label>
+          <input
+            name="email"
+            type="email"
+            placeholder="Enter Email ID"
+            value={form.email}
+            onChange={handleChange}
+            className="w-full px-4 border-[2px] border-gray-300 rounded-[10px] h-12 focus:outline-none focus:ring"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1 text-gray-700 font-medium text-base">Place</label>
+          <input
+            name="place"
+            type="text"
+            placeholder="Enter Place"
+            required
+            value={form.place}
+            onChange={handleChange}
+            className="w-full px-4 border-[2px] border-gray-300 rounded-[10px] h-12 focus:outline-none focus:ring"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1 text-gray-700 font-medium text-base">Plan</label>
+          <select
+            name="plan"
+            value={form.plan}
+            onChange={handleChange}
+            className="w-full px-4 border-[2px] border-gray-300 rounded-[10px] h-12 focus:outline-none focus:ring"
+          >
+            <option value="1month">1 Month</option>
+            <option value="2months">2 Months</option>
+            <option value="3months">3 Months</option>
+            <option value="6months">6 Months</option>
+            <option value="1year">1 Year</option>
+          </select>
+        </div>
+
+        <div className="relative">
+          <label className="block mb-1 text-gray-700 font-medium text-base">Start Date</label>
+          <div className="relative">
+            <img
+              src="/calendar.svg"
+              alt="calendar icon"
+              onClick={() => document.getElementById('start_date').showPicker()} // 👈 JS native method
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 cursor-pointer"
+            />
+            <input
+              id="start_date"
+              name="start_date"
+              type="date"
+              value={form.start_date}
+              onChange={handleChange}
+              className="w-full h-12 pr-4 border-[2px] border-gray-300 pl-10 rounded-[10px] focus:outline-none focus:ring"
+            />
+          </div>
+        </div>
+
+
+        <div className="relative">
+          <label className="block mb-1 text-gray-700 font-medium text-base">End Date</label>
+          <div className="relative">
+            <img
+              src="/calendar.svg"
+              alt="calendar icon"
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+            />
+            <input
+              type="text"
+              value={calculatedEndDate}
+              readOnly
+              className="w-full border-[2px] border-gray-300 text-gray-600 pl-10 h-12 pr-4 rounded-[10px] focus:outline-none focus:ring"
+            />
+          </div>
+        </div>
+
+
+        <div>
+          <label className="block mb-1 text-gray-700 font-medium text-base">Notes</label>
+          <textarea
+            name="notes"
+            placeholder="Optional notes"
+            value={form.notes}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border-[2px] border-gray-300 rounded-[10px] h-24 focus:outline-none focus:ring"
+          />
+        </div>
       </form>
     </div>
   );
