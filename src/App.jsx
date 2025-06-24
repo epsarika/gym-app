@@ -7,6 +7,8 @@ import AddMember from "./pages/AddMember";
 import MemberDetails from "./pages/MemberDetails";
 import EditMember from "./pages/EditMember";
 import "./index.css"
+import MembersList from "./pages/MembersList";
+import Settings from "./pages/Settings";
 
 
 function App() {
@@ -39,6 +41,8 @@ function App() {
           <>
             <Route path="/" element={<Home />} />
             <Route path="/add" element={<AddMember />} />
+            <Route path="/members" element={<MembersList />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="/member/:id" element={<MemberDetails />} />
             <Route path="/edit/:id" element={<EditMember />} />
             <Route path="*" element={<Navigate to="/" />} />

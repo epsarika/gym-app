@@ -2,11 +2,34 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
 import { addMonths, format } from 'date-fns';
+import { SaveButton } from '@/components/Buttons';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function EditMember() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [form, setForm] = useState(null);
+  const [date, setDate] = useState(new Date());
+  const [value, setValue] = useState('');
+  const [open, setOpen] = useState(false);
+  const [month, setMonth] = useState(new Date());
   const [calculatedEndDate, setCalculatedEndDate] = useState('');
 
   const calculateEndDate = (startDate, plan) => {
@@ -32,6 +55,10 @@ export default function EditMember() {
       alert('Error loading member: ' + error.message);
     } else {
       setForm(data);
+      const initialDate = new Date(data.start_date);
+      setDate(initialDate);
+      setValue(format(initialDate, 'MMMM dd, yyyy'));
+      setMonth(initialDate);
       const end = calculateEndDate(data.start_date, data.plan);
       setCalculatedEndDate(format(end, 'yyyy-MM-dd'));
     }
@@ -41,14 +68,16 @@ export default function EditMember() {
     fetchMember();
   }, []);
 
-  const handleChange = (e) => {
-    const updatedForm = { ...form, [e.target.name]: e.target.value };
-    setForm(updatedForm);
-
-    if (['plan', 'start_date'].includes(e.target.name)) {
-      const end = calculateEndDate(updatedForm.start_date, updatedForm.plan);
-      setCalculatedEndDate(format(end, 'yyyy-MM-dd'));
+  useEffect(() => {
+    if (form) {
+      const result = calculateEndDate(date.toISOString().split('T')[0], form.plan);
+      setCalculatedEndDate(format(result, 'yyyy-MM-dd'));
+      setForm((prev) => ({ ...prev, start_date: date.toISOString().split('T')[0] }));
     }
+  }, [form?.plan, date]);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -78,141 +107,141 @@ export default function EditMember() {
   return (
     <div className="max-w-sm mx-auto p-4 text-sm">
       <div className="flex justify-between items-center mb-4">
-        <button
-          onClick={() => navigate(`/member/${id}`)}
-          className="p-1 hover:bg-gray-100 rounded"
-        >
-          <img src="/x.svg" alt="Close" className="w-5 h-5" />
-        </button>
-
+        <Button variant="ghost" size="icon" onClick={() => navigate(`/member/${id}`)}>
+          <X className="h-5 w-5" />
+        </Button>
         <h2 className="text-lg font-semibold">Edit Member</h2>
-        <button
-          onClick={handleSubmit}
-          className="bg-black text-white px-3 h-[36px] rounded-[10px]"
-        >
-          <div className='flex items-center gap-1'>
-            <img src="/save.svg" alt="Save" className="w-4 h-4" />
-            <span>Save</span>
-          </div>
-        </button>
+        <SaveButton onClick={handleSubmit} />
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-[5px]">
-        <div>
-          <label className="block mb-1 text-gray-700 font-medium text-base">Name</label>
-          <input
+        <div className="grid w-full max-w-sm items-center gap-2">
+          <Label>Name</Label>
+          <Input
             name="name"
             type="text"
-            placeholder="Enter Your Name"
             required
             value={form.name}
             onChange={handleChange}
-            className="w-full px-4 border-[2px] border-gray-300 rounded-[10px] h-12 focus:outline-none focus:ring"
           />
         </div>
 
-        <div>
-          <label className="block mb-1 text-gray-700 font-medium text-base">Phone</label>
-          <input
+        <div className="grid w-full max-w-sm items-center gap-2">
+          <Label>Phone</Label>
+          <Input
             name="phone"
             type="text"
-            placeholder="Enter Phone Number"
             required
             value={form.phone}
             onChange={handleChange}
-            className="w-full px-4 border-[2px] border-gray-300 rounded-[10px] h-12 focus:outline-none focus:ring"
           />
-          <p className="text-xs text-gray-400 mt-1">
-            This number will be used to send reminders
-          </p>
+          <p className="text-xs text-gray-400">This number will be used to send reminders</p>
         </div>
 
-        <div>
-          <label className="block mb-1 text-gray-700 font-medium text-base">Email</label>
-          <input
+        <div className="grid w-full max-w-sm items-center gap-2">
+          <Label>Email</Label>
+          <Input
             name="email"
             type="email"
-            placeholder="Enter Email ID"
             value={form.email}
             onChange={handleChange}
-            className="w-full px-4 border-[2px] border-gray-300 rounded-[10px] h-12 focus:outline-none focus:ring"
           />
         </div>
 
-        <div>
-          <label className="block mb-1 text-gray-700 font-medium text-base">Place</label>
-          <input
+        <div className="grid w-full max-w-sm items-center gap-2">
+          <Label>Place</Label>
+          <Input
             name="place"
             type="text"
-            placeholder="Enter Place"
             required
             value={form.place}
             onChange={handleChange}
-            className="w-full px-4 border-[2px] border-gray-300 rounded-[10px] h-12 focus:outline-none focus:ring"
           />
         </div>
 
-        <div>
-          <label className="block mb-1 text-gray-700 font-medium text-base">Plan</label>
-          <select
+        <div className="grid items-center gap-2">
+          <Label>Plan</Label>
+          <Select
             name="plan"
             value={form.plan}
-            onChange={handleChange}
-            className="w-full px-4 border-[2px] border-gray-300 rounded-[10px] h-12 focus:outline-none focus:ring"
+            onValueChange={(value) => setForm((prev) => ({ ...prev, plan: value }))}
           >
-            <option value="1month">1 Month</option>
-            <option value="2months">2 Months</option>
-            <option value="3months">3 Months</option>
-            <option value="6months">6 Months</option>
-            <option value="1year">1 Year</option>
-          </select>
+            <SelectTrigger className="w-full max-w-sm">
+              <SelectValue placeholder="Select Plan" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1month">1 Month</SelectItem>
+              <SelectItem value="2months">2 Months</SelectItem>
+              <SelectItem value="3months">3 Months</SelectItem>
+              <SelectItem value="6months">6 Months</SelectItem>
+              <SelectItem value="1year">1 Year</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
-        <div className="relative">
-          <label className="block mb-1 text-gray-700 font-medium text-base">Start Date</label>
-          <div className="relative">
-            <img
-              src="/calendar.svg"
-              alt="calendar icon"
-              onClick={() => document.getElementById('start_date').showPicker()}
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 cursor-pointer"
+        <div className="flex flex-col gap-3">
+          <Label htmlFor="date" className="px-1">Start Date</Label>
+          <div className="relative flex gap-2">
+            <Input
+              id="date"
+              value={value}
+              className="bg-background pr-10"
+              onChange={(e) => {
+                const newDate = new Date(e.target.value);
+                setValue(e.target.value);
+                if (!isNaN(newDate.getTime())) {
+                  setDate(newDate);
+                  setMonth(newDate);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "ArrowDown") {
+                  e.preventDefault();
+                  setOpen(true);
+                }
+              }}
             />
-            <input
-              id="start_date"
-              name="start_date"
-              type="date"
-              value={form.start_date}
-              onChange={handleChange}
-              className="w-full h-12 pr-4 border-[2px] border-gray-300 pl-10 rounded-[10px] focus:outline-none focus:ring"
-            />
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  id="date-picker"
+                  variant="ghost"
+                  className="absolute top-1/2 right-2 size-6 -translate-y-1/2"
+                >
+                  <CalendarIcon className="size-3.5" />
+                  <span className="sr-only">Select date</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto overflow-hidden p-0" align="end" alignOffset={-8} sideOffset={10}>
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  captionLayout="dropdown"
+                  month={month}
+                  onMonthChange={setMonth}
+                  onSelect={(date) => {
+                    setDate(date);
+                    setValue(format(date, 'MMMM dd, yyyy'));
+                    setOpen(false);
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
 
-        <div className="relative">
-          <label className="block mb-1 text-gray-700 font-medium text-base">End Date</label>
-          <div className="relative">
-            <img
-              src="/calendar.svg"
-              alt="calendar icon"
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
-            />
-            <input
-              type="text"
-              value={calculatedEndDate}
-              readOnly
-              className="w-full border-[2px] border-gray-300 text-gray-600 pl-10 h-12 pr-4 rounded-[10px] focus:outline-none focus:ring"
-            />
-          </div>
+        <div className="grid w-full max-w-sm items-center gap-2">
+          <Label>End Date</Label>
+          <Input type="text" value={calculatedEndDate} readOnly />
         </div>
 
-        <div>
-          <label className="block mb-1 text-gray-700 font-medium text-base">Notes</label>
-          <textarea
+        <div className="grid w-full max-w-sm items-center gap-2">
+          <Label>Notes</Label>
+          <Textarea
             name="notes"
             placeholder="Optional notes"
             value={form.notes || ''}
             onChange={handleChange}
-            className="w-full px-4 py-2 border-[2px] border-gray-300 rounded-[10px] h-24 focus:outline-none focus:ring"
           />
         </div>
       </form>
