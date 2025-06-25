@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./utils/supabase";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import Login from "./components/Login";
+import Login from "./pages/Login";
 import Home from "./pages/Home";
 import AddMember from "./pages/AddMember";
 import MemberDetails from "./pages/MemberDetails";

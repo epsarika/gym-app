@@ -2,14 +2,18 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
 import { Button } from '@/components/ui/button';
+import { LogOut, Loader2 } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
+import PageHeader from '@/components/PageHeader';
 
 export default function Settings() {
   const [userInfo, setUserInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUser = async () => {
+      setLoading(true);
       const { data: { user }, error } = await supabase.auth.getUser();
       if (error || !user) {
         console.error("Error fetching user:", error?.message);
@@ -19,6 +23,7 @@ export default function Settings() {
           email: user.email,
         });
       }
+      setLoading(false);
     };
     fetchUser();
   }, []);
@@ -39,29 +44,37 @@ export default function Settings() {
       .join('')
       .toUpperCase();
 
-  if (!userInfo) return <p className="p-4">Loading...</p>;
-
   return (
-    <div className="max-w-md mx-auto px-4 py-6 space-y-6">
-      <h2 className="text-xl font-semibold">Profile details</h2>
+    <>
+      {/* Always show header */}
+      <PageHeader title="Profile Details" />
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-lg bg-black text-white flex items-center justify-center font-semibold text-sm">
-            {getInitials(userInfo.name)}
+      <div className="max-w-md mx-auto px-4 py-4 my-18 space-y-6">
+        {loading ? (
+          <div className="flex justify-center py-10">
+            <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
           </div>
-          <div className="text-sm">
-            <p className="font-medium">{userInfo.name}</p>
-            <p className="text-muted-foreground">{userInfo.email}</p>
-          </div>
-        </div>
+        ) : (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-lg bg-black text-white flex items-center justify-center font-semibold text-sm">
+                {getInitials(userInfo.name)}
+              </div>
+              <div className="text-sm">
+                <p className="font-medium">{userInfo.name}</p>
+                <p className="text-muted-foreground">{userInfo.email}</p>
+              </div>
+            </div>
 
-        <Button variant="destructive" onClick={handleLogout}>
-          <span className="mr-2">↩️</span> Log Out
-        </Button>
+            <Button variant="destructive" onClick={handleLogout}>
+              <LogOut className="w-4 h-4" />
+              Log Out
+            </Button>
+          </div>
+        )}
       </div>
 
-      <BottomNavigation/>
-    </div>
+      <BottomNavigation />
+    </>
   );
 }

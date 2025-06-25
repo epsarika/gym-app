@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { supabase } from '../utils/supabase';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react'; // Optional: install lucide-react for icons
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from '@/components/ui/button';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -30,52 +33,56 @@ export default function Login() {
         <p className="text-sm text-gray-600 text-center mb-6">Welcome back! Please sign in to continue</p>
 
         {/* Image */}
-        <div className="flex justify-center mb-6">
-          <img src="/login.svg" alt="login" className="w-40 h-40" />
+        <div className="flex justify-center mb-6 ">
+          <img src="/login.svg" alt="login" className="w-full" />
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block mb-1 text-gray-700 font-medium text-base">Email</label>
-            <input
-              type="email"
+
+        <form onSubmit={handleLogin} className="space-y-[10px]">
+          <div className="grid w-full max-w-sm items-center gap-2">
+            <Label>Email</Label>
+            <Input
+              id="email"
+              type="text"
               placeholder="Enter Your Email"
-              className="w-full px-4 border-[2px] border-gray-300 rounded-[10px] h-12 focus:outline-none focus:ring"
+              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
             />
           </div>
 
-          <div>
-            <label className="block mb-1 text-gray-700 font-medium text-base">Password</label>
+          <div className="grid w-full max-w-sm items-center gap-2">
+            <Label htmlFor="password">Password</Label>
             <div className="relative">
-              <input
+              <Input
+                id="password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Enter Password"
-                className="w-full px-4 border-[2px] border-gray-300 rounded-[10px] h-12 focus:outline-none focus:ring"
+                className="pr-10" // Leave space for the icon button
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-500"
               >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </Button>
             </div>
           </div>
 
           {errorMsg && <p className="text-red-500 text-sm">{errorMsg}</p>}
 
-          <button
+          <Button
             type="submit"
-            className="w-full bg-black text-white px-4 h-12 rounded-[10px] hover:bg-gray-800"
+            className="w-full"
           >
             Sign In
-          </button>
+          </Button>
         </form>
 
         <p className="text-gray-500 text-center mt-6 font-medium text-base">

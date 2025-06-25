@@ -21,6 +21,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import PageHeader from '@/components/PageHeader';
 
 export default function EditMember() {
   const { id } = useParams();
@@ -105,15 +106,19 @@ export default function EditMember() {
   if (!form) return <p className="p-4">Loading...</p>;
 
   return (
-    <div className="max-w-sm mx-auto p-4 text-sm">
-      <div className="flex justify-between items-center mb-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate(`/member/${id}`)}>
-          <X className="h-5 w-5" />
-        </Button>
-        <h2 className="text-lg font-semibold">Edit Member</h2>
-        <SaveButton onClick={handleSubmit} />
-      </div>
+    <>
+    
+      <PageHeader
+        title="Edit Member"
+        left={
+          <Button variant="ghost" size="icon" onClick={() => navigate(`/member/${id}`)}>
+            <X className="h-5 w-5" />
+          </Button>
+        }
+        right={<SaveButton onClick={handleSubmit} />}
+      />
 
+<div className="max-w-sm mx-auto p-4 text-sm my-18">
       <form onSubmit={handleSubmit} className="space-y-[5px]">
         <div className="grid w-full max-w-sm items-center gap-2">
           <Label>Name</Label>
@@ -246,5 +251,6 @@ export default function EditMember() {
         </div>
       </form>
     </div>
+    </>
   );
 }

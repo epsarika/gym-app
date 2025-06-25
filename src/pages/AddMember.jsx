@@ -3,24 +3,25 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
 import { addMonths, format } from 'date-fns';
 import { SaveButton } from '@/components/Buttons';
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import PageHeader from '@/components/PageHeader';
 
 export default function AddMember() {
   const [form, setForm] = useState({
@@ -37,11 +38,16 @@ export default function AddMember() {
   const [value, setValue] = useState(format(date, 'MMMM dd, yyyy'));
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState(date);
-  const [calculatedEndDate, setCalculatedEndDate] = useState('');
+
+  const [endDate, setEndDate] = useState(calculateEndDate(date, form.plan));
+  const [endDateStr, setEndDateStr] = useState(format(endDate, 'MMMM dd, yyyy'));
+  const [endOpen, setEndOpen] = useState(false);
+  const [endMonth, setEndMonth] = useState(endDate);
+
   const [gymProfile, setGymProfile] = useState(null);
   const navigate = useNavigate();
 
-  const calculateEndDate = (startDate, plan) => {
+  function calculateEndDate(startDate, plan) {
     const date = new Date(startDate);
     switch (plan) {
       case '1month': return addMonths(date, 1);
@@ -51,11 +57,12 @@ export default function AddMember() {
       case '1year': return addMonths(date, 12);
       default: return date;
     }
-  };
+  }
 
   useEffect(() => {
     const result = calculateEndDate(date.toISOString().split('T')[0], form.plan);
-    setCalculatedEndDate(format(result, 'yyyy-MM-dd'));
+    setEndDate(result);
+    setEndDateStr(format(result, 'MMMM dd, yyyy'));
     setForm((prev) => ({ ...prev, start_date: date.toISOString().split('T')[0] }));
   }, [form.plan, date]);
 
@@ -84,6 +91,10 @@ export default function AddMember() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!form.name || !form.phone || !form.place || !form.plan) {
+      alert("Please fill all required fields: Name, Phone, Place and Plan.");
+      return;
+    }
     const { data: { user } } = await supabase.auth.getUser();
 
     const { error } = await supabase.from('members').insert([{
@@ -96,182 +107,136 @@ export default function AddMember() {
       place: form.place,
       plan: form.plan,
       start_date: form.start_date,
-      end_date: calculatedEndDate,
+      end_date: endDate.toISOString().split('T')[0],
       notes: form.notes,
     }]);
 
     if (error) {
       alert('Error adding member: ' + error.message);
     } else {
-      navigate('/');
+      navigate(-1);
     }
   };
 
   return (
-    <div className="max-w-sm mx-auto p-4 text-sm">
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center gap-2">
+    <>
+      <PageHeader
+        title="Add Member"
+        left={
           <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
             <X className="h-5 w-5" />
           </Button>
-          <h2 className="text-lg font-semibold">Add Member</h2>
-        </div>
-        <SaveButton onClick={handleSubmit} />
-      </div>
+        }
+        right={<SaveButton onClick={handleSubmit} />}
+      />
 
-      <form onSubmit={handleSubmit} className="space-y-[5px]">
-        <div className="grid w-full max-w-sm items-center gap-2">
-          <Label>Name</Label>
-          <Input
-            id="name"
-            name="name"
-            type="text"
-            placeholder="Enter Your Name"
-            required
-            value={form.name}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="grid w-full max-w-sm items-center gap-2">
-          <Label>Phone</Label>
-          <Input
-            id="phone"
-            name="phone"
-            type="text"
-            placeholder="Enter Phone Number"
-            required
-            value={form.phone}
-            onChange={handleChange}
-          />
-          <p className="text-xs text-gray-400">
-            This number will be used to send reminders
-          </p>
-        </div>
-
-        <div className="grid w-full max-w-sm items-center gap-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="Enter Email ID"
-            value={form.email}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="grid w-full max-w-sm items-center gap-2">
-          <Label>Place</Label>
-          <Input
-            id="place"
-            name="place"
-            type="text"
-            placeholder="Enter Place"
-            required
-            value={form.place}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="grid items-center gap-2">
-          <Label>Plan</Label>
-          <Select
-            name="plan"
-            value={form.plan}
-            onValueChange={(value) => setForm((prev) => ({ ...prev, plan: value }))}
-          >
-            <SelectTrigger className="w-full max-w-sm">
-              <SelectValue placeholder="Select Plan" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1month">1 Month</SelectItem>
-              <SelectItem value="2months">2 Months</SelectItem>
-              <SelectItem value="3months">3 Months</SelectItem>
-              <SelectItem value="6months">6 Months</SelectItem>
-              <SelectItem value="1year">1 Year</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex flex-col gap-3">
-          <Label htmlFor="date" className="px-1">
-            Start Date
-          </Label>
-          <div className="relative flex gap-2">
-            <Input
-              id="date"
-              value={value}
-              placeholder="June 01, 2025"
-              className="bg-background pr-10"
-              onChange={(e) => {
-                const newDate = new Date(e.target.value);
-                setValue(e.target.value);
-                if (!isNaN(newDate.getTime())) {
-                  setDate(newDate);
-                  setMonth(newDate);
-                }
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "ArrowDown") {
-                  e.preventDefault();
-                  setOpen(true);
-                }
-              }}
-            />
-            <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  id="date-picker"
-                  variant="ghost"
-                  className="absolute top-1/2 right-2 size-6 -translate-y-1/2"
-                >
-                  <CalendarIcon className="size-3.5" />
-                  <span className="sr-only">Select date</span>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                className="w-auto overflow-hidden p-0"
-                align="end"
-                alignOffset={-8}
-                sideOffset={10}
-              >
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  captionLayout="dropdown"
-                  month={month}
-                  onMonthChange={setMonth}
-                  onSelect={(date) => {
-                    setDate(date);
-                    setValue(format(date, 'MMMM dd, yyyy'));
-                    setOpen(false);
-                  }}
-                />
-              </PopoverContent>
-            </Popover>
+      <div className="max-w-sm mx-auto p-4 text-m my-16">
+        <form onSubmit={handleSubmit} className="space-y-[5px]">
+          <div className="grid w-full max-w-sm items-center gap-2">
+            <Label>Name</Label>
+            <Input name="name" type="text" placeholder="Enter Your Name" required value={form.name} onChange={handleChange} />
           </div>
-        </div>
 
-        <div className="grid w-full max-w-sm items-center gap-2">
-          <Label>End Date</Label>
-          <Input
-            type="text"
-            value={calculatedEndDate}
-            readOnly
-          />
-        </div>
+          <div className="grid w-full max-w-sm items-center gap-2">
+            <Label>Phone</Label>
+            <Input name="phone" type="text" placeholder="Enter Phone Number" required value={form.phone} onChange={handleChange} />
+            <p className="text-xs text-gray-400">This number will be used to send reminders</p>
+          </div>
 
-        <div className="grid w-full max-w-sm items-center gap-2">
-          <Label>Notes</Label>
-          <Textarea
-            name="notes"
-            placeholder="Optional notes"
-            value={form.notes}
-            onChange={handleChange}
-          />
-        </div>
-      </form>
-    </div>
+          <div className="grid w-full max-w-sm items-center gap-2">
+            <Label>Email</Label>
+            <Input name="email" type="email" placeholder="Enter Email ID" value={form.email} onChange={handleChange} />
+          </div>
+
+          <div className="grid w-full max-w-sm items-center gap-2">
+            <Label>Place</Label>
+            <Input name="place" type="text" placeholder="Enter Place" required value={form.place} onChange={handleChange} />
+          </div>
+
+          <div className="grid items-center gap-2">
+            <Label>Plan</Label>
+            <Select value={form.plan} onValueChange={(value) => setForm((prev) => ({ ...prev, plan: value }))}>
+              <SelectTrigger className="w-full max-w-sm">
+                <SelectValue placeholder="Select Plan" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1month">1 Month</SelectItem>
+                <SelectItem value="2months">2 Months</SelectItem>
+                <SelectItem value="3months">3 Months</SelectItem>
+                <SelectItem value="6months">6 Months</SelectItem>
+                <SelectItem value="1year">1 Year</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Start Date */}
+          <div className="flex flex-col gap-3">
+            <Label htmlFor="date" className="px-1">Start Date</Label>
+            <div className="relative flex gap-2">
+              <Input
+                id="date"
+                value={value}
+                onChange={(e) => {
+                  const newDate = new Date(e.target.value);
+                  setValue(e.target.value);
+                  if (!isNaN(newDate.getTime())) {
+                    setDate(newDate);
+                    setMonth(newDate);
+                  }
+                }}
+                onKeyDown={(e) => e.key === 'ArrowDown' && (e.preventDefault(), setOpen(true))}
+              />
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" className="absolute top-1/2 right-2 size-6 -translate-y-1/2">
+                    <CalendarIcon className="size-3.5" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto overflow-hidden p-0" align="end" alignOffset={-8} sideOffset={10}>
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    captionLayout="dropdown"
+                    month={month}
+                    onMonthChange={setMonth}
+                    onSelect={(date) => {
+                      setDate(date);
+                      setValue(format(date, 'MMMM dd, yyyy'));
+                      setOpen(false);
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+
+          {/* End Date */}
+          <div className="flex flex-col gap-3">
+            <Label htmlFor="end-date" className="px-1">End Date</Label>
+            <div className="relative flex gap-2">
+              <Input
+                id="end-date"
+                value={endDateStr}
+                readOnly
+              />
+              <Button type="button" variant="ghost" className="absolute top-1/2 right-2 size-6 -translate-y-1/2">
+                <CalendarIcon className="size-3.5" />
+              </Button>
+
+            </div>
+          </div>
+
+          <div className="grid w-full max-w-sm items-center gap-2">
+            <Label>Notes</Label>
+            <Textarea
+              name="notes"
+              placeholder="Optional notes"
+              value={form.notes}
+              onChange={handleChange}
+            />
+          </div>
+        </form>
+      </div>
+    </>
   );
 }
