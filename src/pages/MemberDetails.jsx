@@ -45,7 +45,7 @@ export default function MemberDetails() {
       <Button
         variant="ghost"
         size="icon"
-        onClick={() => navigate(-1)} // Go back to previous page
+        onClick={() => navigate('/members')} // Go back to previous page
       >
         <ArrowLeft className="w-5 h-5" />
       </Button>
