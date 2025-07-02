@@ -26,6 +26,7 @@ import PageHeader from '@/components/PageHeader';
 export default function EditMember() {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [form, setForm] = useState(null);
   const [date, setDate] = useState(new Date());
   const [value, setValue] = useState('');
@@ -103,11 +104,9 @@ export default function EditMember() {
     }
   };
 
-  if (!form) return <p className="p-4">Loading...</p>;
-
   return (
     <>
-    
+      {/* ✅ Header is rendered immediately */}
       <PageHeader
         title="Edit Member"
         left={
@@ -118,139 +117,124 @@ export default function EditMember() {
         right={<SaveButton onClick={handleSubmit} />}
       />
 
-<div className="max-w-sm mx-auto p-4 text-sm my-18">
-      <form onSubmit={handleSubmit} className="space-y-[5px]">
-        <div className="grid w-full max-w-sm items-center gap-2">
-          <Label>Name</Label>
-          <Input
-            name="name"
-            type="text"
-            required
-            value={form.name}
-            onChange={handleChange}
-          />
-        </div>
+      {/* Show form only when data is loaded */}
+      <div className="max-w-sm mx-auto p-4 text-sm my-16">
+        {form ? (
+          <form onSubmit={handleSubmit} className="space-y-[5px]">
+            <FormField label="Name" name="name" value={form.name} onChange={handleChange} required />
+            <FormField label="Phone" name="phone" value={form.phone} onChange={handleChange} required note="This number will be used to send reminders" />
+            <FormField label="Email" name="email" value={form.email} onChange={handleChange} type="email" />
+            <FormField label="Place" name="place" value={form.place} onChange={handleChange} required />
 
-        <div className="grid w-full max-w-sm items-center gap-2">
-          <Label>Phone</Label>
-          <Input
-            name="phone"
-            type="text"
-            required
-            value={form.phone}
-            onChange={handleChange}
-          />
-          <p className="text-xs text-gray-400">This number will be used to send reminders</p>
-        </div>
+            {/* Plan Selection */}
+            <div className="grid items-center gap-2">
+              <Label>Plan</Label>
+              <Select
+                value={form.plan}
+                onValueChange={(value) => setForm((prev) => ({ ...prev, plan: value }))}
+              >
+                <SelectTrigger className="w-full max-w-sm">
+                  <SelectValue placeholder="Select Plan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1month">1 Month</SelectItem>
+                  <SelectItem value="2months">2 Months</SelectItem>
+                  <SelectItem value="3months">3 Months</SelectItem>
+                  <SelectItem value="6months">6 Months</SelectItem>
+                  <SelectItem value="1year">1 Year</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-        <div className="grid w-full max-w-sm items-center gap-2">
-          <Label>Email</Label>
-          <Input
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="grid w-full max-w-sm items-center gap-2">
-          <Label>Place</Label>
-          <Input
-            name="place"
-            type="text"
-            required
-            value={form.place}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="grid items-center gap-2">
-          <Label>Plan</Label>
-          <Select
-            name="plan"
-            value={form.plan}
-            onValueChange={(value) => setForm((prev) => ({ ...prev, plan: value }))}
-          >
-            <SelectTrigger className="w-full max-w-sm">
-              <SelectValue placeholder="Select Plan" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1month">1 Month</SelectItem>
-              <SelectItem value="2months">2 Months</SelectItem>
-              <SelectItem value="3months">3 Months</SelectItem>
-              <SelectItem value="6months">6 Months</SelectItem>
-              <SelectItem value="1year">1 Year</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex flex-col gap-3">
-          <Label htmlFor="date" className="px-1">Start Date</Label>
-          <div className="relative flex gap-2">
-            <Input
-              id="date"
-              value={value}
-              className="bg-background pr-10"
-              onChange={(e) => {
-                const newDate = new Date(e.target.value);
-                setValue(e.target.value);
-                if (!isNaN(newDate.getTime())) {
-                  setDate(newDate);
-                  setMonth(newDate);
-                }
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "ArrowDown") {
-                  e.preventDefault();
-                  setOpen(true);
-                }
-              }}
-            />
-            <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  id="date-picker"
-                  variant="ghost"
-                  className="absolute top-1/2 right-2 size-6 -translate-y-1/2"
-                >
-                  <CalendarIcon className="size-3.5" />
-                  <span className="sr-only">Select date</span>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto overflow-hidden p-0" align="end" alignOffset={-8} sideOffset={10}>
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  captionLayout="dropdown"
-                  month={month}
-                  onMonthChange={setMonth}
-                  onSelect={(date) => {
-                    setDate(date);
-                    setValue(format(date, 'MMMM dd, yyyy'));
-                    setOpen(false);
+            {/* Start Date Picker */}
+            <div className="flex flex-col gap-3">
+              <Label className="px-1">Start Date</Label>
+              <div className="relative flex gap-2">
+                <Input
+                  value={value}
+                  className="bg-background pr-10"
+                  onChange={(e) => {
+                    const newDate = new Date(e.target.value);
+                    setValue(e.target.value);
+                    if (!isNaN(newDate.getTime())) {
+                      setDate(newDate);
+                      setMonth(newDate);
+                    }
                   }}
+                  onKeyDown={(e) => e.key === "ArrowDown" && (e.preventDefault(), setOpen(true))}
                 />
-              </PopoverContent>
-            </Popover>
-          </div>
-        </div>
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" className="absolute top-1/2 right-2 size-6 -translate-y-1/2">
+                      <CalendarIcon className="size-3.5" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto overflow-hidden p-0" align="end" alignOffset={-8} sideOffset={10}>
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      captionLayout="dropdown"
+                      month={month}
+                      onMonthChange={setMonth}
+                      onSelect={(date) => {
+                        setDate(date);
+                        setValue(format(date, 'MMMM dd, yyyy'));
+                        setOpen(false);
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
 
-        <div className="grid w-full max-w-sm items-center gap-2">
-          <Label>End Date</Label>
-          <Input type="text" value={calculatedEndDate} readOnly />
-        </div>
+            {/* End Date (read-only) */}
+            <FormField label="End Date" value={calculatedEndDate} readOnly />
 
-        <div className="grid w-full max-w-sm items-center gap-2">
-          <Label>Notes</Label>
-          <Textarea
-            name="notes"
-            placeholder="Optional notes"
-            value={form.notes || ''}
-            onChange={handleChange}
-          />
-        </div>
-      </form>
-    </div>
+            <div className="grid w-full max-w-sm items-center gap-2">
+              <Label>Notes</Label>
+              <Textarea
+                name="notes"
+                placeholder="Optional notes"
+                value={form.notes || ''}
+                onChange={handleChange}
+              />
+            </div>
+          </form>
+        ) : (
+          <p className="text-center text-gray-500 mt-10">Loading member data...</p>
+        )}
+      </div>
     </>
+  );
+}
+
+// ✅ Reusable field component
+function FormField({
+  label,
+  name,
+  value,
+  onChange,
+  type = 'text',
+  required,
+  readOnly,
+  note,
+  placeholder = 'Not provided',
+}) {
+  const isEmpty = value === '' || value === null || value === undefined;
+
+  return (
+    <div className="grid w-full max-w-sm items-center gap-2">
+      <Label>{label}</Label>
+      <Input
+        name={name}
+        type={type}
+        value={value}
+        onChange={onChange}
+        required={required}
+        readOnly={readOnly}
+        placeholder={isEmpty ? placeholder : ''}
+      />
+      {note && <p className="text-xs text-gray-400">{note}</p>}
+    </div>
   );
 }

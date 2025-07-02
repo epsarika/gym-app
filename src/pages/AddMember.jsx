@@ -34,6 +34,7 @@ export default function AddMember() {
     notes: '',
   });
 
+  const [hasSubmitted, setHasSubmitted] = useState(false);
   const [date, setDate] = useState(new Date(form.start_date));
   const [value, setValue] = useState(format(date, 'MMMM dd, yyyy'));
   const [open, setOpen] = useState(false);
@@ -91,10 +92,10 @@ export default function AddMember() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.phone || !form.place || !form.plan) {
-      alert("Please fill all required fields: Name, Phone, Place and Plan.");
-      return;
-    }
+    setHasSubmitted(true);
+
+    if (!form.name || !form.phone || !form.place) return;
+
     const { data: { user } } = await supabase.auth.getUser();
 
     const { error } = await supabase.from('members').insert([{
@@ -118,28 +119,47 @@ export default function AddMember() {
     }
   };
 
+  const getFieldClass = (field) => {
+    return hasSubmitted && !form[field] ? 'border-red-500 ring-1 ring-red-500' : '';
+  };
+
   return (
     <>
       <PageHeader
         title="Add Member"
         left={
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-            <X className="h-5 w-5" />
+          <Button variant="ghost" onClick={() => navigate(-1)}>
+            <X />
           </Button>
         }
         right={<SaveButton onClick={handleSubmit} />}
       />
 
       <div className="max-w-sm mx-auto p-4 text-m my-16">
-        <form onSubmit={handleSubmit} className="space-y-[5px]">
-          <div className="grid w-full max-w-sm items-center gap-2">
+        <form onSubmit={handleSubmit} className="space-y-[10px]">
+          <div className="grid w-full max-w-sm items-start gap-2">
             <Label>Name</Label>
-            <Input name="name" type="text" placeholder="Enter Your Name" required value={form.name} onChange={handleChange} />
+            <Input
+              name="name"
+              type="text"
+              placeholder="Enter Your Name"
+              value={form.name}
+              onChange={handleChange}
+              className={getFieldClass('name')}
+            />
           </div>
 
-          <div className="grid w-full max-w-sm items-center gap-2">
-            <Label>Phone</Label>
-            <Input name="phone" type="text" placeholder="Enter Phone Number" required value={form.phone} onChange={handleChange} />
+          <div className="grid w-full max-w-sm items-start gap-2">
+            <Label>Phone </Label>
+            
+            <Input
+              name="phone"
+              type="text"
+              placeholder="Enter Phone Number"
+              value={form.phone}
+              onChange={handleChange}
+              className={getFieldClass('phone')}
+            />
             <p className="text-xs text-gray-400">This number will be used to send reminders</p>
           </div>
 
@@ -148,9 +168,16 @@ export default function AddMember() {
             <Input name="email" type="email" placeholder="Enter Email ID" value={form.email} onChange={handleChange} />
           </div>
 
-          <div className="grid w-full max-w-sm items-center gap-2">
+          <div className="grid w-full max-w-sm items-start gap-2">
             <Label>Place</Label>
-            <Input name="place" type="text" placeholder="Enter Place" required value={form.place} onChange={handleChange} />
+            <Input
+              name="place"
+              type="text"
+              placeholder="Enter Place"
+              value={form.place}
+              onChange={handleChange}
+              className={getFieldClass('place')}
+            />
           </div>
 
           <div className="grid items-center gap-2">
@@ -214,15 +241,10 @@ export default function AddMember() {
           <div className="flex flex-col gap-3">
             <Label htmlFor="end-date" className="px-1">End Date</Label>
             <div className="relative flex gap-2">
-              <Input
-                id="end-date"
-                value={endDateStr}
-                readOnly
-              />
+              <Input id="end-date" value={endDateStr} readOnly />
               <Button type="button" variant="ghost" className="absolute top-1/2 right-2 size-6 -translate-y-1/2">
                 <CalendarIcon className="size-3.5" />
               </Button>
-
             </div>
           </div>
 

@@ -6,7 +6,13 @@ import { isActive } from '../utils/dateUtils';
 import {
   Button
 } from '@/components/ui/button';
-import { MessageSquare, Phone, Pencil, ArrowLeft, Loader2 } from 'lucide-react';
+import {
+  MessageSquare,
+  Phone,
+  Pencil,
+  ArrowLeft,
+  Loader2
+} from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
 import { RenewButton } from '@/components/Buttons';
 import PageHeader from '@/components/PageHeader';
@@ -16,7 +22,7 @@ export default function MemberDetails() {
   const navigate = useNavigate();
   const [member, setMember] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [history, setHistory] = useState([]);
 
   const fetchMember = async () => {
     setLoading(true);
@@ -30,24 +36,30 @@ export default function MemberDetails() {
       console.error('Error fetching member:', error.message);
     } else {
       setMember(data);
+
+      // Initialize history with start record
+      setHistory([
+        {
+          type: 'start',
+          plan: data.plan,
+          start_date: data.start_date,
+          end_date: data.end_date,
+        },
+      ]);
     }
     setLoading(false);
   };
+
   useEffect(() => {
     fetchMember();
   }, [id]);
 
   return (
     <>
-      {/* Header always visible */}
       <PageHeader
         title={member?.name || 'Member'}
         left={
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate('/members')}
-          >
+          <Button variant="ghost" size="icon" onClick={() => navigate('/members')}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
         }
@@ -65,7 +77,7 @@ export default function MemberDetails() {
         }
       />
 
-      <div className="max-w-md mx-auto p-4 space-y-4 my-18">
+      <div className="max-w-md mx-auto p-4 space-y-4 my-16">
         {loading ? (
           <div className="flex justify-center py-10">
             <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
@@ -77,10 +89,7 @@ export default function MemberDetails() {
               <div className="p-3 bg-white rounded-[10px] shadow-sm m-[2px]">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className={`${isActive(member.end_date)
-                      ? "text-green-700"
-                      : "text-red-600"
-                      } text-sm font-medium mb-1`}>
+                    <p className={`${isActive(member.end_date) ? "text-green-700" : "text-red-600"} text-sm font-medium mb-1`}>
                       {isActive(member.end_date) ? "Active Membership" : "Expired Membership"}
                     </p>
                     <p className="text-sm font-medium text-black">
@@ -98,6 +107,15 @@ export default function MemberDetails() {
                       end_date: newEndDate,
                       plan: newPlan,
                     }));
+                    setHistory((prev) => [
+                      ...prev,
+                      {
+                        type: 'renew',
+                        start_date: member.end_date,
+                        end_date: newEndDate,
+                        plan: newPlan,
+                      },
+                    ]);
                   }}
                 />
               </div>
@@ -157,13 +175,33 @@ export default function MemberDetails() {
                 <span>End Date</span>
                 <span>{format(new Date(member.end_date), 'dd MMMM yyyy')}</span>
               </div>
-
             </div>
+
+            {/* Membership History */}
+            {history.length > 0 && (
+              <div className="pt-4 text-sm text-gray-700 space-y-3 border-t border-gray-200">
+                <h3 className="text-base font-medium mb-2">Membership History</h3>
+                {history.map((entry, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-col border rounded-md px-3 py-2 bg-gray-50"
+                  >
+                    <div className="flex justify-between">
+                      <span className="text-gray-500 capitalize">{entry.type}</span>
+                      <span>{entry.plan}</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>{format(new Date(entry.start_date), 'dd MMM yyyy')}</span>
+                      <span>{format(new Date(entry.end_date), 'dd MMM yyyy')}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </>
         )}
       </div>
 
-      {/* Bottom Navigation always visible */}
       <BottomNavigation />
     </>
   );

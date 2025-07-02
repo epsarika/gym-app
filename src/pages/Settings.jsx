@@ -47,9 +47,18 @@ export default function Settings() {
   return (
     <>
       {/* Always show header */}
-      <PageHeader title="Profile Details" />
+      <PageHeader
+        title="Profile Details"
+        right={
+          <Button variant="destructive" size="sm" onClick={handleLogout}>
+            <LogOut className="w-4 h-4" />
+            Log Out
+          </Button>
+        }
+      />
 
-      <div className="max-w-md mx-auto px-4 py-4 my-18 space-y-6">
+
+      <div className="max-w-md mx-auto px-4 py-4 my-16 space-y-6">
         {loading ? (
           <div className="flex justify-center py-10">
             <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
@@ -66,10 +75,6 @@ export default function Settings() {
               </div>
             </div>
 
-            <Button variant="destructive" onClick={handleLogout}>
-              <LogOut className="w-4 h-4" />
-              Log Out
-            </Button>
           </div>
         )}
       </div>

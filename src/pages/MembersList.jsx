@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
 import { format, isAfter, isBefore } from 'date-fns';
 import {
@@ -16,11 +16,16 @@ import BottomNavigation from '@/components/BottomNavigation';
 import PageHeader from '@/components/PageHeader';
 
 export default function MembersList() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const queryParams = new URLSearchParams(location.search);
+  const initialFilter = queryParams.get('filter') || 'all';
+
   const [members, setMembers] = useState([]);
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState(initialFilter);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -41,14 +46,12 @@ export default function MembersList() {
     fetchMembers();
   }, []);
 
-  // Debounce Search
   const [debouncedSearch, setDebouncedSearch] = useState(search);
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedSearch(search), 300);
     return () => clearTimeout(handler);
   }, [search]);
 
-  // Memoized Filter Logic
   const filtered = useMemo(() => {
     return members.filter((m) => {
       const isActiveStatus =
@@ -73,17 +76,28 @@ export default function MembersList() {
 
   return (
     <>
-      {/* Top Header */}
       <PageHeader
         left={
-          <Select value={filter} onValueChange={setFilter}>
-            <SelectTrigger className="text-lg font-semibold border-none shadow-none">
+          <Select
+            value={filter}
+            onValueChange={(value) => {
+              setFilter(value);
+              navigate(`/members?filter=${value}`);
+            }}
+          >
+            <SelectTrigger className="text-lg font-semibold border-none shadow-none p-0">
               <SelectValue placeholder="All Members" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all" className="text-lg">All Members</SelectItem>
-              <SelectItem value="active" className="text-lg">Active</SelectItem>
-              <SelectItem value="expired" className="text-lg">Expired</SelectItem>
+              <SelectItem value="all" className="text-lg font-semibold">
+                All Members
+              </SelectItem>
+              <SelectItem value="active" className="text-lg font-semibold">
+                Active
+              </SelectItem>
+              <SelectItem value="expired" className="text-lg font-semibold">
+                Expired
+              </SelectItem>
             </SelectContent>
           </Select>
         }
@@ -95,8 +109,7 @@ export default function MembersList() {
         }
       />
 
-      {/* Main Content */}
-      <div className="max-w-md mx-auto px-4 py-3 space-y-4 my-18 scrollbar-hide">
+      <div className="max-w-md mx-auto px-4 py-3 space-y-4 my-16 scrollbar-hide">
         <Input
           placeholder="Search"
           value={search}
@@ -104,15 +117,13 @@ export default function MembersList() {
           className="bg-gray-100"
         />
 
-        {/* Loading Spinner */}
         {loading ? (
           <div className="flex justify-center py-10">
             <Loader2 className="animate-spin w-6 h-6 text-gray-500" />
           </div>
         ) : (
           <>
-            {/* Member List */}
-            <div className="divide-y border rounded-xl mt-2">
+            <div className="divide-y mt-2">
               {filtered.map((member) => (
                 <div
                   key={member.id}
@@ -145,7 +156,6 @@ export default function MembersList() {
         )}
       </div>
 
-      {/* Bottom Nav */}
       <BottomNavigation />
     </>
   );
