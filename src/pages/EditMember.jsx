@@ -110,8 +110,8 @@ export default function EditMember() {
       <PageHeader
         title="Edit Member"
         left={
-          <Button variant="ghost" size="icon" onClick={() => navigate(`/member/${id}`)}>
-            <X className="h-5 w-5" />
+          <Button variant="ghost" size="32" onClick={() => navigate(`/member/${id}`)}>
+            <X className="stroke-[3]" />
           </Button>
         }
         right={<SaveButton onClick={handleSubmit} />}
@@ -120,14 +120,14 @@ export default function EditMember() {
       {/* Show form only when data is loaded */}
       <div className="max-w-sm mx-auto p-4 text-sm my-16">
         {form ? (
-          <form onSubmit={handleSubmit} className="space-y-[5px]">
+          <form onSubmit={handleSubmit} className="space-y-[14px]">
             <FormField label="Name" name="name" value={form.name} onChange={handleChange} required />
             <FormField label="Phone" name="phone" value={form.phone} onChange={handleChange} required note="This number will be used to send reminders" />
             <FormField label="Email" name="email" value={form.email} onChange={handleChange} type="email" />
             <FormField label="Place" name="place" value={form.place} onChange={handleChange} required />
 
             {/* Plan Selection */}
-            <div className="grid items-center gap-2">
+            <div className="grid items-center gap-1">
               <Label>Plan</Label>
               <Select
                 value={form.plan}
@@ -147,9 +147,9 @@ export default function EditMember() {
             </div>
 
             {/* Start Date Picker */}
-            <div className="flex flex-col gap-3">
-              <Label className="px-1">Start Date</Label>
-              <div className="relative flex gap-2">
+            <div className="flex flex-col gap-1">
+              <Label>Start Date</Label>
+              <div className="relative flex">
                 <Input
                   value={value}
                   className="bg-background pr-10"
@@ -166,7 +166,7 @@ export default function EditMember() {
                 <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
                     <Button variant="ghost" className="absolute top-1/2 right-2 size-6 -translate-y-1/2">
-                      <CalendarIcon className="size-3.5" />
+                      <CalendarIcon className="size-4" />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto overflow-hidden p-0" align="end" alignOffset={-8} sideOffset={10}>
@@ -190,7 +190,7 @@ export default function EditMember() {
             {/* End Date (read-only) */}
             <FormField label="End Date" value={calculatedEndDate} readOnly />
 
-            <div className="grid w-full max-w-sm items-center gap-2">
+            <div className="grid w-full max-w-sm items-center gap-1">
               <Label>Notes</Label>
               <Textarea
                 name="notes"
@@ -223,7 +223,7 @@ function FormField({
   const isEmpty = value === '' || value === null || value === undefined;
 
   return (
-    <div className="grid w-full max-w-sm items-center gap-2">
+    <div className="grid w-full max-w-sm items-center gap-1">
       <Label>{label}</Label>
       <Input
         name={name}

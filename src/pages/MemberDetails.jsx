@@ -59,8 +59,8 @@ export default function MemberDetails() {
       <PageHeader
         title={member?.name || 'Member'}
         left={
-          <Button variant="ghost" size="icon" onClick={() => navigate('/members')}>
-            <ArrowLeft className="w-5 h-5" />
+          <Button variant="ghost" size="32" onClick={() => navigate('/members')}>
+            <ArrowLeft className="stroke-[3]" />
           </Button>
         }
         right={
@@ -89,10 +89,10 @@ export default function MemberDetails() {
               <div className="p-3 bg-white rounded-[10px] shadow-sm m-[2px]">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className={`${isActive(member.end_date) ? "text-green-700" : "text-red-600"} text-sm font-medium mb-1`}>
+                    <p className={`${isActive(member.end_date) ? "text-green-700" : "text-red-600"} text-lg font-medium mb-1`}>
                       {isActive(member.end_date) ? "Active Membership" : "Expired Membership"}
                     </p>
-                    <p className="text-sm font-medium text-black">
+                    <p className="text-m font-medium text-black">
                       {format(new Date(member.end_date), "dd MMMM yyyy")}
                     </p>
                   </div>
@@ -127,17 +127,17 @@ export default function MemberDetails() {
             </div>
 
             {/* Member Info */}
-            <div className="space-y-3 text-sm">
+            <div className="space-y-3 text-[14px] font-medium">
               <div className="flex justify-between">
-                <span className="text-gray-500">Phone</span>
+                <span>Phone</span>
                 <span>{member.phone}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Email</span>
+                <span>Email</span>
                 <span>{member.email}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Place</span>
+                <span>Place</span>
                 <span>{member.place}</span>
               </div>
 
@@ -166,7 +166,8 @@ export default function MemberDetails() {
             </div>
 
             {/* Membership Period */}
-            <div className="pt-4 text-sm text-gray-700 space-y-3 border-t border-gray-200">
+            <div className="text-[14px] font-medium space-y-3">
+              <h3 className="text-[14px] font-medium text-gray-500 pb-1 border-b border-gray-100">Membership Details</h3>
               <div className="flex justify-between">
                 <span>Start Date</span>
                 <span>{format(new Date(member.start_date), 'dd MMMM yyyy')}</span>
@@ -179,18 +180,15 @@ export default function MemberDetails() {
 
             {/* Membership History */}
             {history.length > 0 && (
-              <div className="pt-4 text-sm text-gray-700 space-y-3 border-t border-gray-200">
-                <h3 className="text-base font-medium mb-2">Membership History</h3>
+              <div className="pt-4 text-[14px] font-medium space-y-3">
+                <h3 className="text-[14px] font-medium text-gray-500 pb-1 border-b border-gray-100">Membership History</h3>
                 {history.map((entry, index) => (
-                  <div
-                    key={index}
-                    className="flex flex-col border rounded-md px-3 py-2 bg-gray-50"
-                  >
+                  <div key={index} className="flex flex-col">
                     <div className="flex justify-between">
-                      <span className="text-gray-500 capitalize">{entry.type}</span>
+                      <span className="capitalize">{entry.type}</span>
                       <span>{entry.plan}</span>
                     </div>
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <div className="flex justify-between text-xs mt-1 text-gray-500">
                       <span>{format(new Date(entry.start_date), 'dd MMM yyyy')}</span>
                       <span>{format(new Date(entry.end_date), 'dd MMM yyyy')}</span>
                     </div>
@@ -201,8 +199,6 @@ export default function MemberDetails() {
           </>
         )}
       </div>
-
-      <BottomNavigation />
     </>
   );
 }

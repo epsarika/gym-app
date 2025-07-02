@@ -72,7 +72,7 @@ export function RenewButton({ id, currentEndDate, onRenew }) {
   return (
     <Dialog open={renewOpen} onOpenChange={setRenewOpen}>
       <DialogTrigger asChild>
-        <Button className="mt-[12px] bg-green-800 rounded-[10px] h-8">
+        <Button className="mt-4 bg-green-800 rounded-[10px] h-[32px]">
           <RefreshCcw className='w-4 h-4' /> Renew
         </Button>
       </DialogTrigger>

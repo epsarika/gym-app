@@ -32,7 +32,7 @@ export default function MembersList() {
       setLoading(true);
       const { data, error } = await supabase
         .from('members')
-        .select('id, name, email, end_date')
+        .select('id, name, place, end_date')
         .order('end_date', { ascending: false });
 
       if (error) {
@@ -109,7 +109,7 @@ export default function MembersList() {
         }
       />
 
-      <div className="max-w-md mx-auto px-4 py-3 space-y-4 my-16 scrollbar-hide">
+      <div className="max-w-md mx-auto px-4 py-3 space-y-4 my-16 mb-18 scrollbar-hide">
         <Input
           placeholder="Search"
           value={search}
@@ -128,17 +128,17 @@ export default function MembersList() {
                 <div
                   key={member.id}
                   onClick={() => navigate(`/member/${member.id}`)}
-                  className="flex items-center justify-between gap-2 px-3 py-2 hover:bg-gray-50 cursor-pointer"
+                  className="flex items-center justify-between gap-2 py-2 hover:bg-gray-50 cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center text-sm font-semibold text-gray-700">
+                    <div className="w-[48px] h-[48px] rounded-lg bg-gray-200 flex items-center justify-center text-m font-semibold text-gray-700">
                       {getInitials(member.name)}
                     </div>
                     <div className="flex flex-col text-[13px]">
                       <p className="font-medium text-[14px]">{member.name}</p>
                       <p className="text-muted-foreground">
                         {format(new Date(member.end_date), 'dd MMM yyyy')}
-                        {member.email ? ` • ${member.email}` : ''}
+                        {` • ${member.place}`}
                       </p>
                     </div>
                   </div>
