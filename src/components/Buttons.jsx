@@ -20,7 +20,7 @@ import { RefreshCcw, Save } from "lucide-react";
 export function SaveButton({ onClick }) {
   return (
     <div onClick={onClick} className="flex flex-wrap items-center gap-2 md:flex-row">
-      <Button>
+      <Button className="gap-2 text-gray-800 dark:text-black dark:bg-gray-300 dark:hover:bg-gray-700">
         <Save className="w-4 h-4" />
         Save
         </Button>

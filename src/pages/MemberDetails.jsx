@@ -60,14 +60,14 @@ export default function MemberDetails() {
         title={member?.name || 'Member'}
         left={
           <Button variant="ghost" size="32" onClick={() => navigate('/members')}>
-            <ArrowLeft className="stroke-[3]" />
+            <ArrowLeft className="stroke-[3] text-black dark:text-white" />
           </Button>
         }
         right={
           member && (
             <Button
               variant="outline"
-              className="gap-2"
+              className="gap-2 dark:border-gray-600 dark:text-white"
               onClick={() => navigate(`/edit/${member.id}`)}
             >
               <Pencil className="w-4 h-4" />
@@ -77,7 +77,7 @@ export default function MemberDetails() {
         }
       />
 
-      <div className="max-w-md mx-auto p-4 space-y-4 my-16">
+      <div className="max-w-md mx-auto p-4 space-y-4 my-16 dark:text-white">
         {loading ? (
           <div className="flex justify-center py-10">
             <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
@@ -85,14 +85,14 @@ export default function MemberDetails() {
         ) : (
           <>
             {/* Membership Card */}
-            <div className="p-[2px] bg-gray-100 border rounded-[10px]">
-              <div className="p-3 bg-white rounded-[10px] shadow-sm m-[2px]">
+            <div className="p-[2px] bg-gray-100 dark:bg-gray-700 border rounded-[10px]">
+              <div className="p-3 bg-white dark:bg-gray-800 rounded-[10px] shadow-sm m-[2px]">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className={`${isActive(member.end_date) ? "text-green-700" : "text-red-600"} text-lg font-medium mb-1`}>
+                    <p className={`${isActive(member.end_date) ? "text-green-700 dark:text-green-400" : "text-red-600 dark:text-red-400"} text-lg font-medium mb-1`}>
                       {isActive(member.end_date) ? "Active Membership" : "Expired Membership"}
                     </p>
-                    <p className="text-m font-medium text-black">
+                    <p className="text-m font-medium text-black dark:text-white">
                       {format(new Date(member.end_date), "dd MMMM yyyy")}
                     </p>
                   </div>
@@ -144,7 +144,7 @@ export default function MemberDetails() {
               <div className="grid grid-cols-2 gap-2">
                 <Button
                   variant="outline"
-                  className="w-full"
+                  className="w-full dark:bg-transparent dark:border-gray-600 dark:text-white"
                   onClick={() =>
                     window.open(
                       `sms:${member.phone}?body=Hi ${member.name}, your gym membership (${member.plan}) has expired. Please renew.`,
@@ -156,7 +156,7 @@ export default function MemberDetails() {
                   Remind
                 </Button>
                 <Button
-                  className="w-full"
+                  className="w-full dark:bg-white dark:text-black"
                   onClick={() => window.open(`tel:${member.phone}`, "_self")}
                 >
                   <Phone className="w-4 h-4 mr-2" />

@@ -2,8 +2,6 @@
 @import "tw-animate-css";
 @import 'tailwind-scrollbar-hide/v4';
 
-@custom-variant dark (&:is(.dark *));
-
 
 input[type="date"]::-webkit-calendar-picker-indicator {
   opacity: 0;

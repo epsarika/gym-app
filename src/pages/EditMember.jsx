@@ -106,18 +106,16 @@ export default function EditMember() {
 
   return (
     <>
-      {/* ✅ Header is rendered immediately */}
       <PageHeader
         title="Edit Member"
         left={
           <Button variant="ghost" size="32" onClick={() => navigate(`/member/${id}`)}>
-            <X className="stroke-[3]" />
+            <X className="stroke-[3] text-black dark:text-white" />
           </Button>
         }
         right={<SaveButton onClick={handleSubmit} />}
       />
 
-      {/* Show form only when data is loaded */}
       <div className="max-w-sm mx-auto p-4 text-sm my-16">
         {form ? (
           <form onSubmit={handleSubmit} className="space-y-[14px]">
@@ -133,10 +131,10 @@ export default function EditMember() {
                 value={form.plan}
                 onValueChange={(value) => setForm((prev) => ({ ...prev, plan: value }))}
               >
-                <SelectTrigger className="w-full max-w-sm">
+                <SelectTrigger className="w-full max-w-sm dark:bg-gray-900 dark:text-white">
                   <SelectValue placeholder="Select Plan" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="dark:bg-gray-900 dark:text-white">
                   <SelectItem value="1month">1 Month</SelectItem>
                   <SelectItem value="2months">2 Months</SelectItem>
                   <SelectItem value="3months">3 Months</SelectItem>
@@ -152,7 +150,7 @@ export default function EditMember() {
               <div className="relative flex">
                 <Input
                   value={value}
-                  className="bg-background pr-10"
+                  className="bg-background pr-10 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
                   onChange={(e) => {
                     const newDate = new Date(e.target.value);
                     setValue(e.target.value);
@@ -165,7 +163,7 @@ export default function EditMember() {
                 />
                 <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
-                    <Button variant="ghost" className="absolute top-1/2 right-2 size-6 -translate-y-1/2">
+                    <Button variant="ghost" className="absolute top-1/2 right-2 size-6 -translate-y-1/2 text-gray-500 dark:text-gray-300">
                       <CalendarIcon className="size-4" />
                     </Button>
                   </PopoverTrigger>
@@ -187,9 +185,19 @@ export default function EditMember() {
               </div>
             </div>
 
-            {/* End Date (read-only) */}
-            <FormField label="End Date" value={calculatedEndDate} readOnly />
-
+            {/* End Date Field with Calendar Icon */}
+<div className="flex flex-col gap-1">
+  <Label>End Date</Label>
+  <div className="relative">
+    <Input
+      value={format(new Date(calculatedEndDate), 'MMMM dd, yyyy')}
+      readOnly
+      className="w-full pr-10 bg-gray-100 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
+    />
+    <CalendarIcon className="absolute top-1/2 right-3 size-4 -translate-y-1/2 text-gray-500 dark:text-gray-300" />
+  </div>
+</div>
+            {/* Notes */}
             <div className="grid w-full max-w-sm items-center gap-1">
               <Label>Notes</Label>
               <Textarea
@@ -197,6 +205,7 @@ export default function EditMember() {
                 placeholder="Optional notes"
                 value={form.notes || ''}
                 onChange={handleChange}
+                className="dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
               />
             </div>
           </form>
@@ -208,7 +217,7 @@ export default function EditMember() {
   );
 }
 
-// ✅ Reusable field component
+// ✅ Reusable Field Component
 function FormField({
   label,
   name,
@@ -218,6 +227,7 @@ function FormField({
   required,
   readOnly,
   note,
+  calendar = false,
   placeholder = 'Not provided',
 }) {
   const isEmpty = value === '' || value === null || value === undefined;
@@ -225,15 +235,21 @@ function FormField({
   return (
     <div className="grid w-full max-w-sm items-center gap-1">
       <Label>{label}</Label>
-      <Input
-        name={name}
-        type={type}
-        value={value}
-        onChange={onChange}
-        required={required}
-        readOnly={readOnly}
-        placeholder={isEmpty ? placeholder : ''}
-      />
+      <div className="relative">
+        <Input
+          name={name}
+          type={type}
+          value={value}
+          onChange={onChange}
+          required={required}
+          readOnly={readOnly}
+          placeholder={isEmpty ? placeholder : ''}
+          className={`w-full pr-10 ${readOnly ? 'bg-gray-100 dark:bg-gray-900' : 'dark:bg-gray-900'} dark:text-white dark:placeholder-gray-400`}
+        />
+        {calendar && (
+          <CalendarIcon className="absolute top-1/2 right-2 size-4 -translate-y-1/2 text-gray-500 dark:text-gray-300" />
+        )}
+      </div>
       {note && <p className="text-xs text-gray-400">{note}</p>}
     </div>
   );

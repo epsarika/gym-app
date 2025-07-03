@@ -131,16 +131,17 @@ export default function AddMember() {
 
         left={
           <Button variant="ghost" size='32' onClick={() => navigate(-1)}>
-            <X className="stroke-[3]" />
+            <X className="stroke-[3] text-black dark:text-white" />
           </Button>
         }
 
         right={<SaveButton onClick={handleSubmit} />}
       />
 
-      <div className="max-w-sm mx-auto p-4 text-m my-16">
+      <div className="max-w-sm mx-auto p-4 text-m my-16 text-gray-900 dark:text-white bg-white dark:bg-black rounded-xl shadow-md">
         <form onSubmit={handleSubmit} className="space-y-[14px]">
-          <div className="grid w-full max-w-sm items-start gap-1">
+          {/* Name */}
+          <div className="grid w-full items-start gap-1">
             <Label>Name</Label>
             <Input
               name="name"
@@ -148,30 +149,39 @@ export default function AddMember() {
               placeholder="Enter Your Name"
               value={form.name}
               onChange={handleChange}
-              className={getFieldClass('name')}
+              className={`${getFieldClass('name')} dark:bg-gray-800 dark:text-white dark:placeholder-gray-400`}
             />
           </div>
 
-          <div className="grid w-full max-w-sm items-start gap-1">
-            <Label>Phone </Label>
-
+          {/* Phone */}
+          <div className="grid w-full items-start gap-1">
+            <Label>Phone</Label>
             <Input
               name="phone"
               type="text"
               placeholder="Enter Phone Number"
               value={form.phone}
               onChange={handleChange}
-              className={getFieldClass('phone')}
+              className={`${getFieldClass('phone')} dark:bg-gray-800 dark:text-white dark:placeholder-gray-400`}
             />
-            <p className="text-xs text-gray-400">This number will be used to send reminders</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">This number will be used to send reminders</p>
           </div>
 
-          <div className="grid w-full max-w-sm items-center gap-1">
+          {/* Email */}
+          <div className="grid w-full items-start gap-1">
             <Label>Email</Label>
-            <Input name="email" type="email" placeholder="Enter Email ID" value={form.email} onChange={handleChange} />
+            <Input
+              name="email"
+              type="email"
+              placeholder="Enter Email ID"
+              value={form.email}
+              onChange={handleChange}
+              className="dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
+            />
           </div>
 
-          <div className="grid w-full max-w-sm items-start gap-1">
+          {/* Place */}
+          <div className="grid w-full items-start gap-1">
             <Label>Place</Label>
             <Input
               name="place"
@@ -179,17 +189,21 @@ export default function AddMember() {
               placeholder="Enter Place"
               value={form.place}
               onChange={handleChange}
-              className={getFieldClass('place')}
+              className={`${getFieldClass('place')} dark:bg-gray-800 dark:text-white dark:placeholder-gray-400`}
             />
           </div>
 
-          <div className="grid items-center gap-1">
+          {/* Plan */}
+          <div className="grid items-start gap-1">
             <Label>Plan</Label>
-            <Select value={form.plan} onValueChange={(value) => setForm((prev) => ({ ...prev, plan: value }))}>
-              <SelectTrigger className="w-full max-w-sm">
+            <Select
+              value={form.plan}
+              onValueChange={(value) => setForm((prev) => ({ ...prev, plan: value }))}
+            >
+              <SelectTrigger className="w-full dark:bg-gray-800 dark:text-white">
                 <SelectValue placeholder="Select Plan" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="dark:bg-gray-800 dark:text-white">
                 <SelectItem value="1month">1 Month</SelectItem>
                 <SelectItem value="2months">2 Months</SelectItem>
                 <SelectItem value="3months">3 Months</SelectItem>
@@ -215,14 +229,18 @@ export default function AddMember() {
                   }
                 }}
                 onKeyDown={(e) => e.key === 'ArrowDown' && (e.preventDefault(), setOpen(true))}
+                className="dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
               />
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" className="absolute top-1/2 right-2 size-6 -translate-y-1/2">
+                  <Button
+                    variant="ghost"
+                    className="absolute top-1/2 right-2 size-6 -translate-y-1/2 text-gray-500 dark:text-gray-300"
+                  >
                     <CalendarIcon className="size-4" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto overflow-hidden p-0" align="end" alignOffset={-8} sideOffset={10}>
+                <PopoverContent className="w-auto overflow-hidden p-0 bg-white dark:bg-gray-800">
                   <Calendar
                     mode="single"
                     selected={date}
@@ -244,24 +262,36 @@ export default function AddMember() {
           <div className="flex flex-col gap-1">
             <Label htmlFor="end-date">End Date</Label>
             <div className="relative flex">
-              <Input id="end-date" value={endDateStr} readOnly />
-              <Button type="button" variant="ghost" className="absolute top-1/2 right-2 size-6 -translate-y-1/2">
+              <Input
+                id="end-date"
+                value={endDateStr}
+                readOnly
+                className="dark:bg-gray-800 dark:text-white"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                className="absolute top-1/2 right-2 size-6 -translate-y-1/2 text-gray-500 dark:text-gray-300"
+              >
                 <CalendarIcon className="size-4" />
               </Button>
             </div>
           </div>
 
-          <div className="grid w-full max-w-sm items-center gap-1">
+          {/* Notes */}
+          <div className="grid w-full items-start gap-1">
             <Label>Notes</Label>
             <Textarea
               name="notes"
               placeholder="Optional notes"
               value={form.notes}
               onChange={handleChange}
+              className="dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
             />
           </div>
         </form>
       </div>
+
     </>
   );
 }

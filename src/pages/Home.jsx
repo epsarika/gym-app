@@ -39,7 +39,7 @@ export default function Home() {
       className={`cursor-pointer hover:shadow-md transition duration-200 rounded-2xl p-4 ${className}`}
     >
       <CardContent className="flex flex-col items-start space-y-1 p-0">
-        <p className="text-xl font-bold">{count}</p>
+        <p className="text-2xl font-bold">{count}</p>
         <p className="text-sm text-muted-foreground">{label}</p>
       </CardContent>
     </Card>
@@ -47,16 +47,16 @@ export default function Home() {
 
   return (
     <>
-      <PageHeader title = "Dashboard" />
+      <PageHeader title="Dashboard" />
 
-      <div className="max-w-md mx-auto px-4 py-6 space-y-4 my-16">
+      <div className="max-w-screen-lg mx-auto px-4 py-6 space-y-6 my-16 bg-white dark:bg-black transition-colors duration-300">
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard
             count={total}
             label="Total Members"
             onClick={() => navigate("/members")}
-            className="bg-blue-50"
+            className="bg-blue-50" // keep cards light
           />
           <StatCard
             count={active}
@@ -74,15 +74,19 @@ export default function Home() {
             count="+"
             label="Add Member"
             onClick={() => navigate("/add")}
-            className="bg-gray-100 text-center items-center justify-center text-3xl font-semibold"
+            className="bg-gray-100 flex items-center justify-center text-3xl font-semibold"
           />
         </div>
 
-        {/* Optional Add Button */}
-        <Button onClick={() => navigate("/add")} className="w-full mt-4">
-          Add Member
-        </Button>
+        {/* Add Button for Mobile View */}
+        <div className="sm:hidden">
+          <Button onClick={() => navigate("/add")} className="w-full dark:bg-gray-300 text-black">
+            Add Member
+          </Button>
+        </div>
       </div>
+
+
 
       <BottomNavigation />
     </>

@@ -58,8 +58,8 @@ export default function MembersList() {
         filter === 'active'
           ? isAfter(new Date(m.end_date), new Date())
           : filter === 'expired'
-          ? isBefore(new Date(m.end_date), new Date())
-          : true;
+            ? isBefore(new Date(m.end_date), new Date())
+            : true;
 
       const matchesSearch = m.name
         .toLowerCase()
@@ -85,10 +85,10 @@ export default function MembersList() {
               navigate(`/members?filter=${value}`);
             }}
           >
-            <SelectTrigger className="text-lg font-semibold border-none shadow-none p-0">
+            <SelectTrigger className="text-lg font-semibold border-none shadow-none p-0 dark:text-white dark:bg-black">
               <SelectValue placeholder="All Members" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="dark:bg-black dark:text-white">
               <SelectItem value="all" className="text-lg font-semibold">
                 All Members
               </SelectItem>
@@ -102,59 +102,64 @@ export default function MembersList() {
           </Select>
         }
         right={
-          <Button onClick={() => navigate('/add')} className="gap-2">
+          <Button
+            onClick={() => navigate('/add')}
+            className="gap-2 bg-black text-white hover:bg-gray-800 dark:bg-gray-300 dark:text-black dark:hover:bg-gray-400"
+          >
             <Plus className="w-4 h-4" />
             Add
           </Button>
         }
       />
 
-      <div className="max-w-md mx-auto px-4 py-3 space-y-4 my-16 mb-18 scrollbar-hide">
+
+      <div className="w-full max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg mx-auto px-4 md:px-6 py-3 md:py-6 space-y-4 my-16 mb-20 bg-white dark:bg-black text-black dark:text-white transition-colors duration-300">
         <Input
           placeholder="Search"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="bg-gray-100"
+          className="bg-gray-100 dark:bg-gray-900 dark:placeholder-gray-400"
         />
 
         {loading ? (
           <div className="flex justify-center py-10">
-            <Loader2 className="animate-spin w-6 h-6 text-gray-500" />
+            <Loader2 className="animate-spin w-6 h-6 text-gray-500 dark:text-gray-300" />
           </div>
         ) : (
           <>
-            <div className="divide-y mt-2">
+            <div className="divide-y divide-gray-200 dark:divide-gray-700 mt-2">
               {filtered.map((member) => (
                 <div
                   key={member.id}
                   onClick={() => navigate(`/member/${member.id}`)}
-                  className="flex items-center justify-between gap-2 py-2 hover:bg-gray-50 cursor-pointer"
+                  className="flex items-center justify-between gap-2 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-[48px] h-[48px] rounded-lg bg-gray-200 flex items-center justify-center text-m font-semibold text-gray-700">
+                    <div className="w-12 h-12 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-sm md:text-base font-semibold text-gray-700 dark:text-gray-200">
                       {getInitials(member.name)}
                     </div>
-                    <div className="flex flex-col text-[13px]">
-                      <p className="font-medium text-[14px]">{member.name}</p>
-                      <p className="text-muted-foreground">
+                    <div className="flex flex-col text-[13px] md:text-[15px]">
+                      <p className="font-medium text-[14px] md:text-[16px]">{member.name}</p>
+                      <p className="text-muted-foreground dark:text-gray-400">
                         {format(new Date(member.end_date), 'dd MMM yyyy')}
                         {` • ${member.place}`}
                       </p>
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-gray-500" />
+                  <ChevronRight className="w-4 h-4 text-gray-500 dark:text-gray-300" />
                 </div>
               ))}
             </div>
 
             {filtered.length === 0 && (
-              <p className="text-center text-muted-foreground text-sm mt-4">
+              <p className="text-center text-muted-foreground dark:text-gray-400 text-sm mt-4">
                 No members found.
               </p>
             )}
           </>
         )}
       </div>
+
 
       <BottomNavigation />
     </>

@@ -46,7 +46,6 @@ export default function Settings() {
 
   return (
     <>
-      {/* Always show header */}
       <PageHeader
         title="Profile Details"
         right={
@@ -57,24 +56,22 @@ export default function Settings() {
         }
       />
 
-
-      <div className="max-w-md mx-auto px-4 py-4 my-16 space-y-6">
+      <div className="max-w-md mx-auto px-4 py-4 my-16 space-y-6  dark:text-white">
         {loading ? (
           <div className="flex justify-center py-10">
-            <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
+            <Loader2 className="w-6 h-6 animate-spin text-gray-500 dark:text-gray-300" />
           </div>
         ) : (
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-black text-white flex items-center justify-center font-semibold text-sm">
+              <div className="w-12 h-12 rounded-lg bg-black text-white dark:bg-gray-700 dark:text-white flex items-center justify-center font-semibold text-sm">
                 {getInitials(userInfo.name)}
               </div>
               <div className="text-sm">
                 <p className="font-medium">{userInfo.name}</p>
-                <p className="text-muted-foreground">{userInfo.email}</p>
+                <p className="text-muted-foreground dark:text-gray-400">{userInfo.email}</p>
               </div>
             </div>
-
           </div>
         )}
       </div>
