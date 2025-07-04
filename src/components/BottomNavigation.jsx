@@ -23,7 +23,7 @@ export default function BottomNavigation() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50">
       <div className="flex justify-around items-center h-[84px] pb-7">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
@@ -38,7 +38,7 @@ export default function BottomNavigation() {
             >
               <img
                 src={isActive ? item.activeIcon : item.icon}
-                className="w-6 h-6 mb-1"
+                className="w-7 h-7 mb-1"
               />
               <span className="text-xs">{item.label}</span>
             </div>

@@ -130,8 +130,8 @@ export default function AddMember() {
         title="Add Member"
 
         left={
-          <Button variant="ghost" size='32' onClick={() => navigate(-1)}>
-            <X className="stroke-[3] text-black" />
+          <Button variant="ghost" size='32' onClick={() => navigate(-1)} className="pr-3">
+            <img src="/x.svg" alt="x" />
           </Button>
         }
 
@@ -149,7 +149,7 @@ export default function AddMember() {
               placeholder="Enter Your Name"
               value={form.name}
               onChange={handleChange}
-              className={`${getFieldClass('name')}`}
+              className={`${getFieldClass('name')} h-10`}
             />
           </div>
 
@@ -162,7 +162,7 @@ export default function AddMember() {
               placeholder="Enter Phone Number"
               value={form.phone}
               onChange={handleChange}
-              className={`${getFieldClass('phone')}`}
+              className={`${getFieldClass('phone')} h-10`}
             />
             <p className="text-xs text-gray-500">This number will be used to send reminders</p>
           </div>
@@ -176,6 +176,7 @@ export default function AddMember() {
               placeholder="Enter Email ID"
               value={form.email}
               onChange={handleChange}
+              className="h-10"
             />
           </div>
 
@@ -188,7 +189,7 @@ export default function AddMember() {
               placeholder="Enter Place"
               value={form.place}
               onChange={handleChange}
-              className={`${getFieldClass('place')}`}
+              className={`${getFieldClass('place')} h-10`}
             />
           </div>
 
@@ -199,7 +200,7 @@ export default function AddMember() {
               value={form.plan}
               onValueChange={(value) => setForm((prev) => ({ ...prev, plan: value }))}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full !h-10">
                 <SelectValue placeholder="Select Plan" />
               </SelectTrigger>
               <SelectContent>
@@ -228,6 +229,7 @@ export default function AddMember() {
                   }
                 }}
                 onKeyDown={(e) => e.key === 'ArrowDown' && (e.preventDefault(), setOpen(true))}
+                className="h-10"
               />
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
@@ -264,6 +266,7 @@ export default function AddMember() {
                 id="end-date"
                 value={endDateStr}
                 readOnly
+                className="h-10"
               />
               <Button
                 type="button"

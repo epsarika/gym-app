@@ -79,13 +79,13 @@ export default function Login() {
 
           <Button
             type="submit"
-            className="w-full"
+            className="w-full rounded-[10px]"
           >
             Sign In
           </Button>
         </form>
 
-        <p className="text-gray-500 text-center mt-6 font-medium text-base">
+        <p className="text-gray-500 text-center mt-6 font-medium text-sm">
           Powered by <a href="#" className="text-blue-500">Our Team</a>
         </p>
       </div>

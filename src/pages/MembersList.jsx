@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Plus, ChevronRight, Loader2, Search } from 'lucide-react';
+import { Plus, ChevronRight, Loader2, Search, ChevronDown } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
 import PageHeader from '@/components/PageHeader';
 
@@ -85,17 +85,18 @@ export default function MembersList() {
               navigate(`/members?filter=${value}`);
             }}
           >
-            <SelectTrigger className="text-lg font-semibold border-none shadow-none p-0 text-gray-900 bg-transparent dark:bg-white">
+            <SelectTrigger className="relative text-lg font-semibold border-none shadow-none p-0 text-gray-900 bg-transparent dark:bg-transparent">
               <SelectValue placeholder="All Members" />
+              <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-5 stroke-[3] text-gray-800" />
             </SelectTrigger>
-            <SelectContent className="bg-white">
-              <SelectItem value="all" className="text-lg font-semibold">
+            <SelectContent className="bg-white p-1 rounded-[10px]">
+              <SelectItem value="all" className="text-[16px] font-semibold">
                 All Members
               </SelectItem>
-              <SelectItem value="active" className="text-lg font-semibold">
+              <SelectItem value="active" className="text-[16px] font-semibold">
                 Active
               </SelectItem>
-              <SelectItem value="expired" className="text-lg font-semibold">
+              <SelectItem value="expired" className="text-[16px] font-semibold">
                 Expired
               </SelectItem>
             </SelectContent>
@@ -131,7 +132,7 @@ export default function MembersList() {
           </div>
         ) : (
           <>
-            <div className="divide-y divide-gray-200 mt-2">
+            <div className="divide-y divide-gray-100 mt-2">
               {filtered.map((member) => (
                 <div
                   key={member.id}
@@ -155,42 +156,48 @@ export default function MembersList() {
               ))}
             </div>
 
-            {filtered.length === 0 && !loading && (
-  <div className="flex flex-col items-center justify-center text-center py-10 space-y-4">
-    <img
-      src="/no-member.svg"
-      alt="No Records"
-      className="w-[280px] h-[180px] object-contain"
-    />
-    <div className="space-y-1">
-      <p className="text-lg font-medium text-gray-900">
-        No records yet.
-      </p>
-      <div className='w-56 sm:w-72 md:w-80 lg:w-96 text-center mx-auto'>
-      <p className="text-m text-gray-500">
-        Add new members by clicking the “Add” button
-      </p>
-      </div>
-    </div>
-    <div className="flex gap-3 pt-2">
-      <Button
-        onClick={() => navigate('/add')}
-        className="rounded-[10px] border border-gray-300"
-        variant="outline"
-      >
-        <Plus className="w-4 h-4 stroke-2.5 text-gray-900" />
-        Add
-      </Button>
-      <Button
-        variant="ghost"
-        onClick={() => navigate('/settings')}
-        className="text-sm text-gray-900"
-      >
-        Settings <ChevronRight className="w-4 h-4 stroke-2.5" />
-      </Button>
-    </div>
-  </div>
-)}
+            {members.length === 0 && !loading ? (
+              // TRUE EMPTY STATE — No members at all
+              <div className="flex flex-col items-center justify-center text-center py-10 space-y-4">
+                <img
+                  src="/no-member.svg"
+                  alt="No Records"
+                  className="w-[280px] h-[180px] object-contain"
+                />
+                <div className="space-y-1">
+                  <p className="text-lg font-medium text-gray-900">
+                    No records yet.
+                  </p>
+                  <div className='w-56 sm:w-72 md:w-80 lg:w-96 text-center mx-auto'>
+                    <p className="text-m text-gray-500">
+                      Add new members by clicking the “Add” button
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <Button
+                    onClick={() => navigate('/add')}
+                    className="rounded-[10px] border border-gray-300"
+                    variant="outline"
+                  >
+                    <Plus className="w-4 h-4 stroke-2.5 text-gray-900" />
+                    Add
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => navigate('/settings')}
+                    className="text-sm text-gray-900"
+                  >
+                    Settings <ChevronRight className="w-4 h-4 stroke-2.5" />
+                  </Button>
+                </div>
+              </div>
+            ) : filtered.length === 0 && !loading ? (
+              // SPECIFIC FILTER EMPTY — Show minimal feedback
+              <div className="text-center py-10 text-gray-500 text-sm">
+                No members found.
+              </div>
+            ) : null}
 
           </>
         )}
