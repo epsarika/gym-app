@@ -131,14 +131,14 @@ export default function AddMember() {
 
         left={
           <Button variant="ghost" size='32' onClick={() => navigate(-1)}>
-            <X className="stroke-[3] text-black dark:text-white" />
+            <X className="stroke-[3] text-black" />
           </Button>
         }
 
         right={<SaveButton onClick={handleSubmit} />}
       />
 
-      <div className="max-w-sm mx-auto p-4 text-m my-16 text-gray-900 dark:text-white bg-white dark:bg-black rounded-xl shadow-md">
+      <div className="max-w-sm mx-auto p-4 text-m my-16 text-gray-900 bg-white rounded-[10px]">
         <form onSubmit={handleSubmit} className="space-y-[14px]">
           {/* Name */}
           <div className="grid w-full items-start gap-1">
@@ -149,7 +149,7 @@ export default function AddMember() {
               placeholder="Enter Your Name"
               value={form.name}
               onChange={handleChange}
-              className={`${getFieldClass('name')} dark:bg-gray-800 dark:text-white dark:placeholder-gray-400`}
+              className={`${getFieldClass('name')}`}
             />
           </div>
 
@@ -162,9 +162,9 @@ export default function AddMember() {
               placeholder="Enter Phone Number"
               value={form.phone}
               onChange={handleChange}
-              className={`${getFieldClass('phone')} dark:bg-gray-800 dark:text-white dark:placeholder-gray-400`}
+              className={`${getFieldClass('phone')}`}
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400">This number will be used to send reminders</p>
+            <p className="text-xs text-gray-500">This number will be used to send reminders</p>
           </div>
 
           {/* Email */}
@@ -176,7 +176,6 @@ export default function AddMember() {
               placeholder="Enter Email ID"
               value={form.email}
               onChange={handleChange}
-              className="dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
             />
           </div>
 
@@ -189,7 +188,7 @@ export default function AddMember() {
               placeholder="Enter Place"
               value={form.place}
               onChange={handleChange}
-              className={`${getFieldClass('place')} dark:bg-gray-800 dark:text-white dark:placeholder-gray-400`}
+              className={`${getFieldClass('place')}`}
             />
           </div>
 
@@ -200,10 +199,10 @@ export default function AddMember() {
               value={form.plan}
               onValueChange={(value) => setForm((prev) => ({ ...prev, plan: value }))}
             >
-              <SelectTrigger className="w-full dark:bg-gray-800 dark:text-white">
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select Plan" />
               </SelectTrigger>
-              <SelectContent className="dark:bg-gray-800 dark:text-white">
+              <SelectContent>
                 <SelectItem value="1month">1 Month</SelectItem>
                 <SelectItem value="2months">2 Months</SelectItem>
                 <SelectItem value="3months">3 Months</SelectItem>
@@ -229,18 +228,17 @@ export default function AddMember() {
                   }
                 }}
                 onKeyDown={(e) => e.key === 'ArrowDown' && (e.preventDefault(), setOpen(true))}
-                className="dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
               />
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="absolute top-1/2 right-2 size-6 -translate-y-1/2 text-gray-500 dark:text-gray-300"
+                    className="absolute top-1/2 right-2 size-6 -translate-y-1/2 text-gray-500"
                   >
                     <CalendarIcon className="size-4" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto overflow-hidden p-0 bg-white dark:bg-gray-800">
+                <PopoverContent className="w-auto overflow-hidden p-0 bg-white">
                   <Calendar
                     mode="single"
                     selected={date}
@@ -266,12 +264,11 @@ export default function AddMember() {
                 id="end-date"
                 value={endDateStr}
                 readOnly
-                className="dark:bg-gray-800 dark:text-white"
               />
               <Button
                 type="button"
                 variant="ghost"
-                className="absolute top-1/2 right-2 size-6 -translate-y-1/2 text-gray-500 dark:text-gray-300"
+                className="absolute top-1/2 right-2 size-6 -translate-y-1/2 text-gray-500"
               >
                 <CalendarIcon className="size-4" />
               </Button>
@@ -286,7 +283,6 @@ export default function AddMember() {
               placeholder="Optional notes"
               value={form.notes}
               onChange={handleChange}
-              className="dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
             />
           </div>
         </form>

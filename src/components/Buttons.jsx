@@ -20,7 +20,7 @@ import { RefreshCcw, Save } from "lucide-react";
 export function SaveButton({ onClick }) {
   return (
     <div onClick={onClick} className="flex flex-wrap items-center gap-2 md:flex-row">
-      <Button className="gap-2 text-gray-800 dark:text-black dark:bg-gray-300 dark:hover:bg-gray-700">
+      <Button className="gap-2 rounded-[10px]">
         <Save className="w-4 h-4" />
         Save
         </Button>
@@ -78,13 +78,16 @@ export function RenewButton({ id, currentEndDate, onRenew }) {
       </DialogTrigger>
 
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Renew Membership</DialogTitle>
+        <DialogHeader className="p-0">
+          <DialogTitle className="text-left">Renew Membership</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 text-sm">
+        <div className="space-y-3 text-sm">
+           <p className="text-sm text-muted-foreground mt-1">
+            Current End Date: {format(new Date(currentEndDate), "dd MMM yyyy")}
+          </p>
           <div>
-            <label className="mb-1 block font-medium">Add Duration</label>
+            <label className="mb-1 block font-medium">Select New Plan</label>
             <Select value={newPlan} onValueChange={setNewPlan}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select Plan" />
@@ -100,16 +103,12 @@ export function RenewButton({ id, currentEndDate, onRenew }) {
           </div>
 
           <p className="text-sm text-muted-foreground">
-            Current End Date: {format(new Date(currentEndDate), "dd MMM yyyy")}
-          </p>
-
-          <p className="text-sm text-muted-foreground">
             New End Date: {newEndDate ? format(new Date(newEndDate), "dd MMM yyyy") : 'Calculating...'}
           </p>
         </div>
 
         <DialogFooter>
-          <Button onClick={handleRenew}>Confirm Renewal</Button>
+          <Button onClick={handleRenew} className="rounded-[10px]">Confirm Renewal</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

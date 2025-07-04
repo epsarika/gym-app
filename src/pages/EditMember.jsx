@@ -110,7 +110,7 @@ export default function EditMember() {
         title="Edit Member"
         left={
           <Button variant="ghost" size="32" onClick={() => navigate(`/member/${id}`)}>
-            <X className="stroke-[3] text-black dark:text-white" />
+            <X className="stroke-[3] text-black" />
           </Button>
         }
         right={<SaveButton onClick={handleSubmit} />}
@@ -131,10 +131,10 @@ export default function EditMember() {
                 value={form.plan}
                 onValueChange={(value) => setForm((prev) => ({ ...prev, plan: value }))}
               >
-                <SelectTrigger className="w-full max-w-sm dark:bg-gray-900 dark:text-white">
+                <SelectTrigger className="w-full max-w-sm">
                   <SelectValue placeholder="Select Plan" />
                 </SelectTrigger>
-                <SelectContent className="dark:bg-gray-900 dark:text-white">
+                <SelectContent>
                   <SelectItem value="1month">1 Month</SelectItem>
                   <SelectItem value="2months">2 Months</SelectItem>
                   <SelectItem value="3months">3 Months</SelectItem>
@@ -150,7 +150,7 @@ export default function EditMember() {
               <div className="relative flex">
                 <Input
                   value={value}
-                  className="bg-background pr-10 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
+                  className="bg-background pr-10"
                   onChange={(e) => {
                     const newDate = new Date(e.target.value);
                     setValue(e.target.value);
@@ -163,7 +163,7 @@ export default function EditMember() {
                 />
                 <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
-                    <Button variant="ghost" className="absolute top-1/2 right-2 size-6 -translate-y-1/2 text-gray-500 dark:text-gray-300">
+                    <Button variant="ghost" className="absolute top-1/2 right-2 size-6 -translate-y-1/2 text-gray-500">
                       <CalendarIcon className="size-4" />
                     </Button>
                   </PopoverTrigger>
@@ -186,17 +186,17 @@ export default function EditMember() {
             </div>
 
             {/* End Date Field with Calendar Icon */}
-<div className="flex flex-col gap-1">
-  <Label>End Date</Label>
-  <div className="relative">
-    <Input
-      value={format(new Date(calculatedEndDate), 'MMMM dd, yyyy')}
-      readOnly
-      className="w-full pr-10 bg-gray-100 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
-    />
-    <CalendarIcon className="absolute top-1/2 right-3 size-4 -translate-y-1/2 text-gray-500 dark:text-gray-300" />
-  </div>
-</div>
+            <div className="flex flex-col gap-1">
+              <Label>End Date</Label>
+              <div className="relative">
+                <Input
+                  value={format(new Date(calculatedEndDate), 'MMMM dd, yyyy')}
+                  readOnly
+                  className="w-full pr-1"
+                />
+                <CalendarIcon className="absolute top-1/2 right-3 size-4 -translate-y-1/2 text-gray-500" />
+              </div>
+            </div>
             {/* Notes */}
             <div className="grid w-full max-w-sm items-center gap-1">
               <Label>Notes</Label>
@@ -205,7 +205,6 @@ export default function EditMember() {
                 placeholder="Optional notes"
                 value={form.notes || ''}
                 onChange={handleChange}
-                className="dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
               />
             </div>
           </form>
@@ -244,7 +243,7 @@ function FormField({
           required={required}
           readOnly={readOnly}
           placeholder={isEmpty ? placeholder : ''}
-          className={`w-full pr-10 ${readOnly ? 'bg-gray-100 dark:bg-gray-900' : 'dark:bg-gray-900'} dark:text-white dark:placeholder-gray-400`}
+          className={`w-full pr-10`}
         />
         {calendar && (
           <CalendarIcon className="absolute top-1/2 right-2 size-4 -translate-y-1/2 text-gray-500 dark:text-gray-300" />

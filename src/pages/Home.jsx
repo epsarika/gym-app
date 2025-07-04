@@ -49,7 +49,7 @@ export default function Home() {
     <>
       <PageHeader title="Dashboard" />
 
-      <div className="max-w-screen-lg mx-auto px-4 py-6 space-y-6 my-16 bg-white dark:bg-black transition-colors duration-300">
+      <div className="max-w-screen-lg mx-auto px-4 py-6 space-y-6 my-16 bg-white transition-colors duration-300">
         {/* Stats Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard
@@ -80,7 +80,7 @@ export default function Home() {
 
         {/* Add Button for Mobile View */}
         <div className="sm:hidden">
-          <Button onClick={() => navigate("/add")} className="w-full dark:bg-gray-300 text-black">
+          <Button onClick={() => navigate("/add")} className="w-full text-white">
             Add Member
           </Button>
         </div>

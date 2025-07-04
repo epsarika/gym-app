@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Plus, ChevronRight, Loader2 } from 'lucide-react';
+import { Plus, ChevronRight, Loader2, Search } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
 import PageHeader from '@/components/PageHeader';
 
@@ -85,10 +85,10 @@ export default function MembersList() {
               navigate(`/members?filter=${value}`);
             }}
           >
-            <SelectTrigger className="text-lg font-semibold border-none shadow-none p-0 dark:text-white dark:bg-black">
+            <SelectTrigger className="text-lg font-semibold border-none shadow-none p-0 text-gray-900 bg-transparent dark:bg-white">
               <SelectValue placeholder="All Members" />
             </SelectTrigger>
-            <SelectContent className="dark:bg-black dark:text-white">
+            <SelectContent className="bg-white">
               <SelectItem value="all" className="text-lg font-semibold">
                 All Members
               </SelectItem>
@@ -100,11 +100,12 @@ export default function MembersList() {
               </SelectItem>
             </SelectContent>
           </Select>
+
         }
         right={
           <Button
             onClick={() => navigate('/add')}
-            className="gap-2 bg-black text-white hover:bg-gray-800 dark:bg-gray-300 dark:text-black dark:hover:bg-gray-400"
+            className="gap-2 bg-black text-white hover:bg-gray-800 rounded-[10px]"
           >
             <Plus className="w-4 h-4" />
             Add
@@ -113,49 +114,84 @@ export default function MembersList() {
       />
 
 
-      <div className="w-full max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg mx-auto px-4 md:px-6 py-3 md:py-6 space-y-4 my-16 mb-20 bg-white dark:bg-black text-black dark:text-white transition-colors duration-300">
-        <Input
-          placeholder="Search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="bg-gray-100 dark:bg-gray-900 dark:placeholder-gray-400"
-        />
+      <div className="w-full max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg mx-auto px-4 md:px-6 py-3 md:py-6 space-y-4 my-16 mb-20 bg-white text-black transition-colors duration-300">
+        <div className="relative w-full max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 h-4 w-4" />
+          <Input
+            placeholder="Search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10 bg-gray-100 border-0 shadow-none"
+          />
+        </div>
 
         {loading ? (
           <div className="flex justify-center py-10">
-            <Loader2 className="animate-spin w-6 h-6 text-gray-500 dark:text-gray-300" />
+            <Loader2 className="animate-spin w-6 h-6 text-gray-500" />
           </div>
         ) : (
           <>
-            <div className="divide-y divide-gray-200 dark:divide-gray-700 mt-2">
+            <div className="divide-y divide-gray-200 mt-2">
               {filtered.map((member) => (
                 <div
                   key={member.id}
                   onClick={() => navigate(`/member/${member.id}`)}
-                  className="flex items-center justify-between gap-2 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                  className="flex items-center justify-between gap-2 py-2 hover:bg-gray-50 cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-sm md:text-base font-semibold text-gray-700 dark:text-gray-200">
+                    <div className="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center text-sm md:text-base font-semibold text-gray-700">
                       {getInitials(member.name)}
                     </div>
                     <div className="flex flex-col text-[13px] md:text-[15px]">
                       <p className="font-medium text-[14px] md:text-[16px]">{member.name}</p>
-                      <p className="text-muted-foreground dark:text-gray-400">
+                      <p className="text-muted-foreground">
                         {format(new Date(member.end_date), 'dd MMM yyyy')}
                         {` • ${member.place}`}
                       </p>
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-gray-500 dark:text-gray-300" />
+                  <ChevronRight className="w-4 h-4 text-gray-500" />
                 </div>
               ))}
             </div>
 
-            {filtered.length === 0 && (
-              <p className="text-center text-muted-foreground dark:text-gray-400 text-sm mt-4">
-                No members found.
-              </p>
-            )}
+            {filtered.length === 0 && !loading && (
+  <div className="flex flex-col items-center justify-center text-center py-10 space-y-4">
+    <img
+      src="/no-member.svg"
+      alt="No Records"
+      className="w-[280px] h-[180px] object-contain"
+    />
+    <div className="space-y-1">
+      <p className="text-lg font-medium text-gray-900">
+        No records yet.
+      </p>
+      <div className='w-56 sm:w-72 md:w-80 lg:w-96 text-center mx-auto'>
+      <p className="text-m text-gray-500">
+        Add new members by clicking the “Add” button
+      </p>
+      </div>
+    </div>
+    <div className="flex gap-3 pt-2">
+      <Button
+        onClick={() => navigate('/add')}
+        className="rounded-[10px] border border-gray-300"
+        variant="outline"
+      >
+        <Plus className="w-4 h-4 stroke-2.5 text-gray-900" />
+        Add
+      </Button>
+      <Button
+        variant="ghost"
+        onClick={() => navigate('/settings')}
+        className="text-sm text-gray-900"
+      >
+        Settings <ChevronRight className="w-4 h-4 stroke-2.5" />
+      </Button>
+    </div>
+  </div>
+)}
+
           </>
         )}
       </div>

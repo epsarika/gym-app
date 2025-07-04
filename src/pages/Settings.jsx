@@ -49,22 +49,22 @@ export default function Settings() {
       <PageHeader
         title="Profile Details"
         right={
-          <Button variant="destructive" size="sm" onClick={handleLogout}>
+          <Button variant="destructive" size="sm" onClick={handleLogout} className="rounded-[10px] dark:bg-red-600">
             <LogOut className="w-4 h-4" />
             Log Out
           </Button>
         }
       />
 
-      <div className="max-w-md mx-auto px-4 py-4 my-16 space-y-6  dark:text-white">
+      <div className="max-w-md mx-auto px-4 py-4 my-16 space-y-6">
         {loading ? (
           <div className="flex justify-center py-10">
-            <Loader2 className="w-6 h-6 animate-spin text-gray-500 dark:text-gray-300" />
+            <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
           </div>
         ) : (
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-black text-white dark:bg-gray-700 dark:text-white flex items-center justify-center font-semibold text-sm">
+              <div className="w-12 h-12 rounded-lg bg-black text-white flex items-center justify-center font-semibold text-sm">
                 {getInitials(userInfo.name)}
               </div>
               <div className="text-sm">
