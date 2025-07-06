@@ -57,7 +57,7 @@ export default function MemberDetails() {
   return (
     <>
       <PageHeader
-        title={member?.name || 'Member'}
+        title={member?.name}
         left={
           <Button variant="ghost" size="32" onClick={() => navigate('/members')} className="pr-3">
             <img src="/back-button.svg" alt="Back" />
@@ -79,25 +79,70 @@ export default function MemberDetails() {
 
       <div className="max-w-md mx-auto p-4 space-y-4 my-16">
         {loading ? (
-          <div className="flex justify-center py-10">
-            <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
-          </div>
-        ) : (
+  <div className="space-y-6 animate-pulse">
+    {/* Skeleton for membership card */}
+    <div className="p-[2px] bg-gray-200 border rounded-[15px]">
+      <div className="relative p-3 bg-white rounded-[10px] shadow-md m-[3px] overflow-hidden">
+        <div className="h-4 w-32 bg-gray-200 rounded mb-2" />
+        <div className="h-3 w-24 bg-gray-100 rounded mb-4" />
+        <div className="h-8 w-full bg-gray-200 rounded" />
+      </div>
+      <div className="ml-3 mt-2 h-3 w-24 bg-gray-100 rounded" />
+    </div>
+
+    {/* Skeleton for member info */}
+    <div className="space-y-3">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="flex justify-between">
+          <div className="w-20 h-3 bg-gray-200 rounded" />
+          <div className="w-24 h-3 bg-gray-100 rounded" />
+        </div>
+      ))}
+    </div>
+
+    {/* Skeleton for buttons */}
+    <div className="grid grid-cols-2 gap-2">
+      <div className="h-10 bg-gray-200 rounded" />
+      <div className="h-10 bg-gray-200 rounded" />
+    </div>
+
+    {/* Skeleton for membership period */}
+    <div className="space-y-3">
+      <div className="h-4 w-32 bg-gray-200 rounded mb-2" />
+      <div className="flex justify-between">
+        <div className="w-24 h-3 bg-gray-100 rounded" />
+        <div className="w-24 h-3 bg-gray-100 rounded" />
+      </div>
+      <div className="flex justify-between">
+        <div className="w-24 h-3 bg-gray-100 rounded" />
+        <div className="w-24 h-3 bg-gray-100 rounded" />
+      </div>
+    </div>
+  </div>
+) : (
+
           <>
             {/* Membership Card */}
             <div className="p-[2px] bg-gray-200 border rounded-[15px]">
-              <div className="p-3 bg-white rounded-[10px] shadow-md m-[3px]">
+              <div className="relative p-3 bg-white rounded-[10px] shadow-md m-[3px] overflow-hidden">
+                {/* Stamp inside white box, cropped on right */}
+                <img
+                  src="/logo.png"
+                  alt="Gym Logo"
+                  className="absolute top-0 right-0 w-56 h-56 object-contain translate-x-20 -translate-y-18 opacity-80 pointer-events-none"
+                />
+
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className={`${isActive(member.end_date) ? "text-green-700 " : "text-red-600"} text-lg font-medium mb-1`}>
+                    <p className={`${isActive(member.end_date) ? "text-green-700" : "text-red-600"} text-lg font-medium mb-1`}>
                       {isActive(member.end_date) ? "Active Membership" : "Expired Membership"}
                     </p>
                     <p className="text-m font-medium text-black">
                       {format(new Date(member.end_date), "dd MMMM yyyy")}
                     </p>
                   </div>
-                  <img src="/logo.png" alt="Gym Logo" className="w-24 h-24 object-contain -mt-6 -mr-6 self-start" />
                 </div>
+
                 <RenewButton
                   id={member.id}
                   currentEndDate={member.end_date}
@@ -119,6 +164,7 @@ export default function MemberDetails() {
                   }}
                 />
               </div>
+
               {isActive(member.end_date) && (
                 <p className="text-gray-500 text-xs ml-3 my-[5px]">
                   {differenceInDays(new Date(member.end_date), new Date())} Days Remaining
@@ -126,53 +172,47 @@ export default function MemberDetails() {
               )}
             </div>
 
+
+
             {/* Member Info */}
-<div className="space-y-3 text-[14px] font-medium">
-  <div className="flex justify-between">
-    <span className='text-gray-500'>Phone</span>
-    <span>{member.phone}</span>
-  </div>
-  <div className="flex justify-between">
-    <span className='text-gray-500'>Email</span>
-    <span>{member.email}</span>
-  </div>
-  <div className="flex justify-between">
-    <span className='text-gray-500'>Place</span>
-    <span>{member.place}</span>
-  </div>
+            <div className="space-y-3 text-[14px] font-medium">
+              <div className="flex justify-between">
+                <span className='text-gray-500'>Phone</span>
+                <span>{member.phone}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className='text-gray-500'>Email</span>
+                <span>{member.email}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className='text-gray-500'>Place</span>
+                <span>{member.place}</span>
+              </div>
 
-  {member.notes && (
-    <div className="flex flex-col mt-3">
-      <span className="text-gray-500 mb-1">Notes</span>
-      <p className="text-[14px] text-black font-normal whitespace-pre-wrap">
-        {member.notes}
-      </p>
-    </div>
-  )}
 
-  <div className="grid grid-cols-2 gap-2">
-    <Button
-      variant="outline"
-      className="w-full rounded-[10px] dark:bg-transparent"
-      onClick={() =>
-        window.open(
-          `sms:${member.phone}?body=Hi ${member.name}, your gym membership (${member.plan}) has expired on ${member.end_date}. Kindly renew to continue your workouts. Contact us at 6238417389`,
-          "_self"
-        )
-      }
-    >
-      <MessageSquare className="w-4 h-4 mr-2" />
-      Remind
-    </Button>
-    <Button
-      className="w-full rounded-[10px]"
-      onClick={() => window.open(`tel:${member.phone}`, "_self")}
-    >
-      <Phone className="w-4 h-4 mr-2" />
-      Call
-    </Button>
-  </div>
-</div>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  variant="outline"
+                  className="w-full rounded-[10px] dark:bg-transparent"
+                  onClick={() =>
+                    window.open(
+                      `sms:${member.phone}?body=Hi ${member.name}, your gym membership (${member.plan}) has expired on ${member.end_date}. Kindly renew to continue your workouts. Contact us at 6238417389`,
+                      "_self"
+                    )
+                  }
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Remind
+                </Button>
+                <Button
+                  className="w-full rounded-[10px]"
+                  onClick={() => window.open(`tel:${member.phone}`, "_self")}
+                >
+                  <Phone className="w-4 h-4 mr-2" />
+                  Call
+                </Button>
+              </div>
+            </div>
 
 
             {/* Membership Period */}
@@ -188,9 +228,20 @@ export default function MemberDetails() {
               </div>
             </div>
 
+            <div className="text-[14px] font-medium space-y-3">
+              {member.notes && (
+                <div className="flex flex-col mt-3">
+                  <span className="text-gray-500 mb-1">Notes</span>
+                  <p className="text-[14px] text-black font-normal whitespace-pre-wrap">
+                    {member.notes}
+                  </p>
+                </div>
+              )}
+            </div>
+
             {/* Membership History */}
             {history.length > 0 && (
-              <div className="pt-4 text-[14px] font-medium space-y-3">
+              <div className="pt-2 text-[14px] font-medium space-y-3">
                 <h3 className="text-[14px] font-medium text-black pb-1 border-b border-gray-100">Membership History</h3>
                 {history.map((entry, index) => (
                   <div key={index} className="flex flex-col">

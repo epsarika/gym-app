@@ -89,7 +89,7 @@ export default function MembersList() {
               <SelectValue placeholder="All Members" />
               <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-5 stroke-[3] text-gray-800" />
             </SelectTrigger>
-            <SelectContent className="bg-white p-1 rounded-[10px]">
+            <SelectContent className="bg-white p-1 rounded-[12px]">
               <SelectItem value="all" className="text-[16px] font-semibold">
                 All Members
               </SelectItem>
@@ -127,10 +127,22 @@ export default function MembersList() {
         </div>
 
         {loading ? (
-          <div className="flex justify-center py-10">
-            <Loader2 className="animate-spin w-6 h-6 text-gray-500" />
+          <div className="space-y-4 animate-pulse mt-4">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="flex items-center justify-between py-2">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-lg bg-gray-200" />
+                  <div className="flex flex-col gap-2">
+                    <div className="w-32 h-4 bg-gray-200 rounded"></div>
+                    <div className="w-20 h-3 bg-gray-100 rounded"></div>
+                  </div>
+                </div>
+                <div className="w-4 h-4 bg-gray-200 rounded" />
+              </div>
+            ))}
           </div>
         ) : (
+
           <>
             <div className="divide-y divide-gray-100 mt-2">
               {filtered.map((member) => (

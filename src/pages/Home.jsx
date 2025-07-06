@@ -64,14 +64,15 @@ export default function Home() {
         }
       />
 
-      <div className="w-full max-w-md mx-auto px-4 py-6 space-y-4 my-16">
+      <div className="w-full max-w-md mx-auto px-4 space-y-4 my-16 py-3">
         {/* Total Members Card */}
         <div
           onClick={() => navigate("/members?filter=all")}
           className="w-full rounded-[16px] border p-4 bg-white flex flex-col cursor-pointer hover:shadow"
         >
+          {/* Top Section */}
           <div className="flex items-start justify-between">
-            <p className="text-lg font-bold text-gray-900">Total Members</p>
+            <h2 className="text-lg font-semibold text-gray-900">Total Members</h2>
             <button>
               <img
                 src="/3-dots.svg"
@@ -81,25 +82,30 @@ export default function Home() {
             </button>
           </div>
 
-          <h2 className="text-[38px] font-semibold text-gray-900 mt-2">
-            {total}
-          </h2>
+          {/* Bottom Section - Horizontal Layout */}
+          <div className="mt-1 flex items-end justify-between">
+            {/* Count + Bottom Text */}
+            <div>
+              <h2 className="text-[38px] font-semibold text-gray-900 mb-1">
+                {total}
+              </h2>
+              <p className="text-sm text-gray-500">
+                {getThisMonthNewMembersCount()} new{" "}
+                {getThisMonthNewMembersCount() === 1 ? "member" : "members"} this month
+              </p>
+            </div>
 
-          <div className="flex items-end justify-between">
-            <p className="text-sm text-gray-500">
-              {getThisMonthNewMembersCount()} new{" "}
-              {getThisMonthNewMembersCount() === 1
-                ? "member"
-                : "members"}{" "}
-              this month
-            </p>
-            <img
-              src="/green-chart.svg"
-              alt="Graph"
-              className="h-[48px] object-contain"
-            />
+            {/* Chart Image */}
+            <div>
+              <img
+                src="/green-chart.svg"
+                alt="Graph"
+                className="h-[48px] object-contain"
+              />
+            </div>
           </div>
         </div>
+
 
         {/* Active & Expired Cards */}
         <div className="grid grid-cols-2 gap-4 w-full">
@@ -108,7 +114,7 @@ export default function Home() {
             onClick={() => navigate("/members?filter=active")}
             className="rounded-[16px] border p-3 bg-white flex flex-col gap-3 justify-between cursor-pointer hover:shadow"
           >
-            <div className="text-md font-semibold text-gray-900">
+            <div className="text-lg font-semibold text-gray-900">
               Active Members
             </div>
             <div className="flex items-end justify-between">
@@ -116,7 +122,7 @@ export default function Home() {
                 {active}
               </span>
               <img
-                src="/green-chart.svg"
+                src="/green-chart2.svg"
                 alt="Green Chart"
                 className="h-[26px] object-contain"
               />
@@ -128,7 +134,7 @@ export default function Home() {
             onClick={() => navigate("/members?filter=expired")}
             className="rounded-[16px] border p-3 bg-white flex flex-col gap-2 justify-between cursor-pointer hover:shadow"
           >
-            <div className="text-md font-semibold text-gray-900">
+            <div className="text-lg font-semibold text-gray-900">
               Expired Members
             </div>
             <div className="flex items-end justify-between">

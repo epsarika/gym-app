@@ -48,6 +48,7 @@ export default function Login() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className="h-10"
             />
           </div>
 
@@ -58,7 +59,7 @@ export default function Login() {
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Enter Password"
-                className="pr-10" // Leave space for the icon button
+                className="pr-10 h-10" // Leave space for the icon button
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -79,7 +80,7 @@ export default function Login() {
 
           <Button
             type="submit"
-            className="w-full rounded-[10px]"
+            className="w-full rounded-[10px] h-10"
           >
             Sign In
           </Button>

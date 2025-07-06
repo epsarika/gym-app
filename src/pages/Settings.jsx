@@ -49,7 +49,7 @@ export default function Settings() {
       <PageHeader
         title="Profile Details"
         right={
-          <Button variant="destructive" size="sm" onClick={handleLogout} className="rounded-[10px] dark:bg-red-600">
+          <Button variant="destructive" onClick={handleLogout} className="rounded-[10px] dark:bg-red-600">
             <LogOut className="w-4 h-4" />
             Log Out
           </Button>
@@ -58,22 +58,27 @@ export default function Settings() {
 
       <div className="max-w-md mx-auto px-4 py-4 my-16 space-y-6">
         {loading ? (
-          <div className="flex justify-center py-10">
-            <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
-          </div>
-        ) : (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-black text-white flex items-center justify-center font-semibold text-sm">
-                {getInitials(userInfo.name)}
-              </div>
-              <div className="text-sm">
-                <p className="font-medium">{userInfo.name}</p>
-                <p className="text-muted-foreground dark:text-gray-400">{userInfo.email}</p>
-              </div>
-            </div>
-          </div>
-        )}
+  <div className="flex items-center gap-4 animate-pulse">
+    <div className="w-12 h-12 rounded-lg bg-gray-300" />
+    <div className="flex flex-col gap-2">
+      <div className="w-32 h-4 bg-gray-300 rounded" />
+      <div className="w-24 h-3 bg-gray-200 rounded" />
+    </div>
+  </div>
+) : (
+  <div className="flex items-center justify-between">
+    <div className="flex items-center gap-4">
+      <div className="w-12 h-12 rounded-lg bg-black text-white flex items-center justify-center font-semibold text-sm">
+        {getInitials(userInfo.name)}
+      </div>
+      <div className="text-sm">
+        <p className="font-medium">{userInfo.name}</p>
+        <p className="text-muted-foreground dark:text-gray-400">{userInfo.email}</p>
+      </div>
+    </div>
+  </div>
+)}
+
       </div>
 
       <BottomNavigation />
