@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
 import { format, differenceInDays } from 'date-fns';
@@ -13,9 +13,12 @@ import {
   ArrowLeft,
   Loader2
 } from 'lucide-react';
-import BottomNavigation from '@/components/BottomNavigation';
 import { RenewButton } from '@/components/Buttons';
 import PageHeader from '@/components/PageHeader';
+
+// Global cache for member details
+let memberDetailsCache = new Map();
+const CACHE_DURATION = 3 * 60 * 1000; // 3 minutes (shorter than main cache as details might change more frequently)
 
 export default function MemberDetails() {
   const { id } = useParams();
@@ -24,43 +27,208 @@ export default function MemberDetails() {
   const [loading, setLoading] = useState(true);
   const [history, setHistory] = useState([]);
 
-  const fetchMember = async () => {
+  // Memoized formatted plan to avoid recalculation
+  const formatPlan = useCallback((plan) => {
+    if (!plan) return '';
+    
+    const formatted = plan.replace(/(\d+)([a-zA-Z]+)/, '$1 $2');
+    return formatted
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }, []);
+
+  // Memoized member status calculations
+  const memberStatus = useMemo(() => {
+    if (!member) return { isActiveMember: false, daysRemaining: 0 };
+    
+    const isActiveMember = isActive(member.end_date);
+    const daysRemaining = isActiveMember 
+      ? differenceInDays(new Date(member.end_date), new Date()) 
+      : 0;
+    
+    return { isActiveMember, daysRemaining };
+  }, [member?.end_date]);
+
+  // Memoized formatted dates
+  const formattedDates = useMemo(() => {
+    if (!member) return { startDate: '', endDate: '' };
+    
+    return {
+      startDate: format(new Date(member.start_date), 'dd MMMM yyyy'),
+      endDate: format(new Date(member.end_date), 'dd MMMM yyyy')
+    };
+  }, [member?.start_date, member?.end_date]);
+
+  // Memoized contact handlers
+  const contactHandlers = useMemo(() => {
+    if (!member) return { handleSMS: null, handleCall: null };
+    
+    const handleSMS = () => {
+      const message = `Hi ${member.name}, your gym membership (${member.plan}) has expired on ${member.end_date}. Kindly renew to continue your workouts. Contact us at 6238417389`;
+      window.open(`sms:${member.phone}?body=${encodeURIComponent(message)}`, "_self");
+    };
+
+    const handleCall = () => {
+      window.open(`tel:${member.phone}`, "_self");
+    };
+
+    return { handleSMS, handleCall };
+  }, [member?.name, member?.phone, member?.plan, member?.end_date]);
+
+  const fetchMember = useCallback(async (forceRefresh = false) => {
+    const cacheKey = `member_${id}`;
+    const now = Date.now();
+    const cachedData = memberDetailsCache.get(cacheKey);
+    
+    // Check cache validity
+    if (cachedData && !forceRefresh && (now - cachedData.timestamp < CACHE_DURATION)) {
+      setMember(cachedData.member);
+      setHistory(cachedData.history);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
-    const { data, error } = await supabase
-      .from('members')
-      .select('*')
-      .eq('id', id)
-      .single();
+    
+    try {
+      const { data, error } = await supabase
+        .from('members')
+        .select('*')
+        .eq('id', id)
+        .single();
 
-    if (error) {
-      console.error('Error fetching member:', error.message);
-    } else {
-      setMember(data);
+      if (error) {
+        console.error('Error fetching member:', error.message);
+        setLoading(false);
+        return;
+      }
 
-      // Initialize history with start record
-      setHistory([
+      const historyData = [
         {
           type: 'start',
           plan: data.plan,
           start_date: data.start_date,
           end_date: data.end_date,
         },
-      ]);
+      ];
+
+      // Update cache
+      memberDetailsCache.set(cacheKey, {
+        member: data,
+        history: historyData,
+        timestamp: now
+      });
+
+      setMember(data);
+      setHistory(historyData);
+    } catch (err) {
+      console.error('Unexpected error fetching member:', err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  };
+  }, [id]);
 
   useEffect(() => {
-    fetchMember();
-  }, [id]);
+    if (id) {
+      fetchMember();
+    }
+  }, [id, fetchMember]);
+
+  // Optimized navigation handlers
+  const handleBack = useCallback(() => {
+    navigate('/members');
+  }, [navigate]);
+
+  const handleEdit = useCallback(() => {
+    navigate(`/edit/${member.id}`);
+  }, [navigate, member?.id]);
+
+  // Optimized renewal handler
+  const handleRenew = useCallback((newEndDate, newPlan) => {
+    const updatedMember = {
+      ...member,
+      end_date: newEndDate,
+      plan: newPlan,
+    };
+    
+    const newHistoryEntry = {
+      type: 'renew',
+      start_date: member.end_date,
+      end_date: newEndDate,
+      plan: newPlan,
+    };
+    
+    const updatedHistory = [...history, newHistoryEntry];
+    
+    // Update state
+    setMember(updatedMember);
+    setHistory(updatedHistory);
+    
+    // Update cache
+    const cacheKey = `member_${id}`;
+    memberDetailsCache.set(cacheKey, {
+      member: updatedMember,
+      history: updatedHistory,
+      timestamp: Date.now()
+    });
+  }, [member, history, id]);
+
+  // Loading skeleton component - matching home.jsx style
+  const LoadingSkeleton = () => (
+    <div className="space-y-6">
+      {/* Skeleton for membership card */}
+      <div className="p-[2px] bg-gray-200 border rounded-[15px]">
+        <div className="relative p-3 bg-white rounded-[10px] shadow-md m-[3px] overflow-hidden">
+          <div className="h-4 w-32 skeleton mb-2" />
+          <div className="h-3 w-24 skeleton mb-4" />
+          <div className="h-8 w-full skeleton" />
+        </div>
+        <div className="ml-3 mt-2 h-3 w-24 skeleton" />
+      </div>
+
+      {/* Skeleton for member info */}
+      <div className="space-y-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="flex justify-between">
+            <div className="w-20 h-3 skeleton" />
+            <div className="w-24 h-3 skeleton" />
+          </div>
+        ))}
+      </div>
+
+      {/* Skeleton for buttons */}
+      <div className="grid grid-cols-2 gap-2">
+        <div className="h-10 skeleton" />
+        <div className="h-10 skeleton" />
+      </div>
+
+      {/* Skeleton for membership period */}
+      <div className="space-y-3">
+        <div className="h-4 w-32 skeleton mb-2" />
+        <div className="flex justify-between">
+          <div className="w-24 h-3 skeleton" />
+          <div className="w-24 h-3 skeleton" />
+        </div>
+        <div className="flex justify-between">
+          <div className="w-24 h-3 skeleton" />
+          <div className="w-24 h-3 skeleton" />
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <>
       <PageHeader
-        title={member?.name}
+        title={
+          <span title={member?.name} className="block max-w-[200px] truncate text-ellipsis">
+            {member?.name || 'Loading...'}
+          </span>
+        }
         left={
-          <Button variant="ghost" size="32" onClick={() => navigate('/members')} className="pr-3">
-            <img src="/back-button.svg" alt="Back" />
+          <Button variant="ghost" size="32" onClick={handleBack} className="pr-3">
+            <img src="/back-button.svg" alt="Back" loading="lazy" />
           </Button>
         }
         right={
@@ -68,7 +236,7 @@ export default function MemberDetails() {
             <Button
               variant="outline"
               className="gap-2 rounded-[10px]"
-              onClick={() => navigate(`/edit/${member.id}`)}
+              onClick={handleEdit}
             >
               <Pencil className="w-4 h-4" />
               Edit
@@ -77,50 +245,10 @@ export default function MemberDetails() {
         }
       />
 
-      <div className="max-w-md mx-auto p-4 space-y-4 my-16">
+      <div className="max-w-md mx-auto p-4 space-y-4 py-3 my-16">
         {loading ? (
-  <div className="space-y-6 animate-pulse">
-    {/* Skeleton for membership card */}
-    <div className="p-[2px] bg-gray-200 border rounded-[15px]">
-      <div className="relative p-3 bg-white rounded-[10px] shadow-md m-[3px] overflow-hidden">
-        <div className="h-4 w-32 bg-gray-200 rounded mb-2" />
-        <div className="h-3 w-24 bg-gray-100 rounded mb-4" />
-        <div className="h-8 w-full bg-gray-200 rounded" />
-      </div>
-      <div className="ml-3 mt-2 h-3 w-24 bg-gray-100 rounded" />
-    </div>
-
-    {/* Skeleton for member info */}
-    <div className="space-y-3">
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="flex justify-between">
-          <div className="w-20 h-3 bg-gray-200 rounded" />
-          <div className="w-24 h-3 bg-gray-100 rounded" />
-        </div>
-      ))}
-    </div>
-
-    {/* Skeleton for buttons */}
-    <div className="grid grid-cols-2 gap-2">
-      <div className="h-10 bg-gray-200 rounded" />
-      <div className="h-10 bg-gray-200 rounded" />
-    </div>
-
-    {/* Skeleton for membership period */}
-    <div className="space-y-3">
-      <div className="h-4 w-32 bg-gray-200 rounded mb-2" />
-      <div className="flex justify-between">
-        <div className="w-24 h-3 bg-gray-100 rounded" />
-        <div className="w-24 h-3 bg-gray-100 rounded" />
-      </div>
-      <div className="flex justify-between">
-        <div className="w-24 h-3 bg-gray-100 rounded" />
-        <div className="w-24 h-3 bg-gray-100 rounded" />
-      </div>
-    </div>
-  </div>
-) : (
-
+          <LoadingSkeleton />
+        ) : (
           <>
             {/* Membership Card */}
             <div className="p-[2px] bg-gray-200 border rounded-[15px]">
@@ -130,15 +258,16 @@ export default function MemberDetails() {
                   src="/logo.png"
                   alt="Gym Logo"
                   className="absolute top-0 right-0 w-56 h-56 object-contain translate-x-20 -translate-y-18 opacity-80 pointer-events-none"
+                  loading="lazy"
                 />
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className={`${isActive(member.end_date) ? "text-green-700" : "text-red-600"} text-lg font-medium mb-1`}>
-                      {isActive(member.end_date) ? "Active Membership" : "Expired Membership"}
+                    <p className={`${memberStatus.isActiveMember ? "text-green-700" : "text-red-600"} text-lg font-semibold mb-1`}>
+                      {memberStatus.isActiveMember ? "Active Membership" : "Expired Membership"}
                     </p>
-                    <p className="text-m font-medium text-black">
-                      {format(new Date(member.end_date), "dd MMMM yyyy")}
+                    <p className="text-sm font-medium text-gray-900">
+                      {formattedDates.endDate}
                     </p>
                   </div>
                 </div>
@@ -146,67 +275,51 @@ export default function MemberDetails() {
                 <RenewButton
                   id={member.id}
                   currentEndDate={member.end_date}
-                  onRenew={(newEndDate, newPlan) => {
-                    setMember((prev) => ({
-                      ...prev,
-                      end_date: newEndDate,
-                      plan: newPlan,
-                    }));
-                    setHistory((prev) => [
-                      ...prev,
-                      {
-                        type: 'renew',
-                        start_date: member.end_date,
-                        end_date: newEndDate,
-                        plan: newPlan,
-                      },
-                    ]);
-                  }}
+                  onRenew={handleRenew}
                 />
               </div>
 
-              {isActive(member.end_date) && (
-                <p className="text-gray-500 text-xs ml-3 my-[5px]">
-                  {differenceInDays(new Date(member.end_date), new Date())} Days Remaining
+              {memberStatus.isActiveMember && (
+                <p className="text-gray-500 text-xs ml-3 mb-[5px] mt-[6px]">
+                  {memberStatus.daysRemaining} Days Remaining
                 </p>
               )}
             </div>
 
-
-
             {/* Member Info */}
             <div className="space-y-3 text-[14px] font-medium">
-              <div className="flex justify-between">
+              <div className="flex justify-between gap-4">
                 <span className='text-gray-500'>Phone</span>
-                <span>{member.phone}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className='text-gray-500'>Email</span>
-                <span>{member.email}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className='text-gray-500'>Place</span>
-                <span>{member.place}</span>
+                <span className="truncate max-w-[160px] text-right">{member.phone}</span>
               </div>
 
+              <div className="flex justify-between gap-4">
+                <span className="text-gray-500">Email</span>
+                <span title={member.email}
+                  className={`max-w-[240px] text-right truncate ${member.email?.trim() ? "text-gray-800" : "text-gray-400"
+                    }`}
+                >
+                  {member.email?.trim() ? member.email : "Not provided"}
+                </span>
+              </div>
+
+              <div className="flex justify-between gap-4">
+                <span className='text-gray-500'>Place</span>
+                <span className="max-w-[240px] text-right truncate" title={member.place}>{member.place}</span>
+              </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <Button
                   variant="outline"
-                  className="w-full rounded-[10px] dark:bg-transparent"
-                  onClick={() =>
-                    window.open(
-                      `sms:${member.phone}?body=Hi ${member.name}, your gym membership (${member.plan}) has expired on ${member.end_date}. Kindly renew to continue your workouts. Contact us at 6238417389`,
-                      "_self"
-                    )
-                  }
+                  className="w-full rounded-[10px] dark:bg-transparent transition-colors"
+                  onClick={contactHandlers.handleSMS}
                 >
                   <MessageSquare className="w-4 h-4 mr-2" />
                   Remind
                 </Button>
                 <Button
-                  className="w-full rounded-[10px]"
-                  onClick={() => window.open(`tel:${member.phone}`, "_self")}
+                  className="w-full rounded-[10px] transition-colors"
+                  onClick={contactHandlers.handleCall}
                 >
                   <Phone className="w-4 h-4 mr-2" />
                   Call
@@ -214,30 +327,30 @@ export default function MemberDetails() {
               </div>
             </div>
 
-
             {/* Membership Period */}
             <div className="text-[14px] font-medium space-y-3">
               <h3 className="text-[14px] font-medium text-black pb-1 border-b border-gray-100">Membership Details</h3>
               <div className="flex justify-between">
                 <span className='text-gray-500'>Start Date</span>
-                <span>{format(new Date(member.start_date), 'dd MMMM yyyy')}</span>
+                <span>{formattedDates.startDate}</span>
               </div>
               <div className="flex justify-between">
                 <span className='text-gray-500'>End Date</span>
-                <span>{format(new Date(member.end_date), 'dd MMMM yyyy')}</span>
+                <span>{formattedDates.endDate}</span>
               </div>
             </div>
 
-            <div className="text-[14px] font-medium space-y-3">
-              {member.notes && (
+            {/* Notes */}
+            {member.notes && (
+              <div className="text-[14px] font-medium">
                 <div className="flex flex-col mt-3">
                   <span className="text-gray-500 mb-1">Notes</span>
-                  <p className="text-[14px] text-black font-normal whitespace-pre-wrap">
+                  <p className="text-[14px] text-black font-normal">
                     {member.notes}
                   </p>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Membership History */}
             {history.length > 0 && (
@@ -246,8 +359,8 @@ export default function MemberDetails() {
                 {history.map((entry, index) => (
                   <div key={index} className="flex flex-col">
                     <div className="flex justify-between">
-                      <span className="capitalize text-gray-500">{entry.type}</span>
-                      <span>{entry.plan}</span>
+                      <span className='capitalize'>{entry.type}</span>
+                      <span>{formatPlan(entry.plan)}</span>
                     </div>
                     <div className="flex justify-between text-xs mt-1 text-gray-400">
                       <span>{format(new Date(entry.start_date), 'dd MMM yyyy')}</span>

@@ -209,18 +209,19 @@ export default function EditMember() {
             </div>
           </form>
         ) : (
-          <div className="space-y-4 animate-pulse">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="space-y-2">
-                <div className="h-4 w-24 bg-gray-200 rounded" />
-                <div className="h-10 w-full bg-gray-100 rounded" />
-              </div>
-            ))}
-            <div className="space-y-2">
-              <div className="h-4 w-24 bg-gray-200 rounded" />
-              <div className="h-24 w-full bg-gray-100 rounded" />
-            </div>
-          </div>
+          <div className="space-y-4 animate-pulse mt-2">
+    {[...Array(6)].map((_, idx) => (
+      <div key={idx} className="space-y-1">
+        <div className="h-4 w-24 skeleton" />
+        <div className="h-10 w-full skeleton rounded" />
+      </div>
+    ))}
+    {/* Notes skeleton */}
+    <div className="space-y-1">
+      <div className="h-4 w-24 skeleton" />
+      <div className="h-20 w-full skeleton rounded" />
+    </div>
+  </div>
         )}
       </div>
     </>
