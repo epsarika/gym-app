@@ -129,15 +129,24 @@ export default function MemberDetails() {
     }
   }, [id]);
 
-  useEffect(() => {
-    if (id) {
-      fetchMember();
-    }
-  }, [id, fetchMember]);
+useEffect(() => {
+  const queryParams = new URLSearchParams(location.search);
+  const shouldRefresh = queryParams.get('refresh') === 'true';
+
+  if (id) {
+    fetchMember(shouldRefresh);
+  }
+
+  if (shouldRefresh) {
+    // Clean the URL (remove ?refresh=true)
+    queryParams.delete('refresh');
+    navigate({ pathname: location.pathname, search: queryParams.toString() }, { replace: true });
+  }
+}, [id, fetchMember, location.search, navigate]);
 
   // Optimized navigation handlers
   const handleBack = useCallback(() => {
-    navigate('/members');
+    navigate("/members");
   }, [navigate]);
 
   const handleEdit = useCallback(() => {

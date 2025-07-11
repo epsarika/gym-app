@@ -167,7 +167,7 @@ export default function Home() {
             onClick={() => handleNavigation("/members?filter=active")}
             className="rounded-[16px] border p-3 bg-white flex flex-col gap-3 justify-between cursor-pointer hover:shadow transition-shadow"
           >
-            <div className="text-[17px] font-semibold text-gray-900">
+            <div className="text-[16px] font-semibold text-gray-900">
               Active Members
             </div>
             <div className="flex items-end justify-between">
@@ -192,7 +192,7 @@ export default function Home() {
             onClick={() => handleNavigation("/members?filter=expired")}
             className="rounded-[16px] border p-3 bg-white flex flex-col gap-2 justify-between cursor-pointer hover:shadow transition-shadow"
           >
-            <div className="text-[17px] font-semibold text-gray-900">
+            <div className="text-[16px] font-semibold text-gray-900">
               Expired Members
             </div>
             <div className="flex items-end justify-between">

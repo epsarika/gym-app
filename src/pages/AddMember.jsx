@@ -115,7 +115,7 @@ export default function AddMember() {
     if (error) {
       alert('Error adding member: ' + error.message);
     } else {
-      navigate(-1);
+      navigate("/members?refresh=true");
     }
   };
 

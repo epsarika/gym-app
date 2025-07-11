@@ -100,7 +100,7 @@ export default function EditMember() {
     if (error) {
       alert('Error updating member: ' + error.message);
     } else {
-      navigate(`/member/${id}`);
+      navigate(`/member/${id}?refresh=true`);
     }
   };
 

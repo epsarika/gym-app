@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Plus, ChevronDown, Search } from 'lucide-react';
+import { Plus, ChevronDown, Search, ChevronRight } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
 import PageHeader from '@/components/PageHeader';
 import MemberList from '@/components/MemberList';
@@ -62,7 +62,7 @@ export default function MembersList() {
     // Apply search
     if (search.trim()) {
       const searchLower = search.toLowerCase().trim();
-      filtered = filtered.filter(member => 
+      filtered = filtered.filter(member =>
         member.name.toLowerCase().includes(searchLower) ||
         member.place.toLowerCase().includes(searchLower) ||
         (member.email && member.email.toLowerCase().includes(searchLower))
@@ -75,9 +75,9 @@ export default function MembersList() {
   const fetchMembers = useCallback(async (forceRefresh = false) => {
     // Check if we have valid cached data
     const now = Date.now();
-    const cacheValid = membersListCache.data && 
-                      membersListCache.timestamp && 
-                      (now - membersListCache.timestamp < CACHE_DURATION);
+    const cacheValid = membersListCache.data &&
+      membersListCache.timestamp &&
+      (now - membersListCache.timestamp < CACHE_DURATION);
 
     if (cacheValid && !forceRefresh) {
       setMembers(membersListCache.data);
@@ -114,8 +114,18 @@ export default function MembersList() {
   }, []);
 
   useEffect(() => {
-    fetchMembers();
-  }, [fetchMembers]);
+    const queryParams = new URLSearchParams(location.search);
+    const shouldRefresh = queryParams.get('refresh') === 'true';
+
+    fetchMembers(shouldRefresh);
+
+    if (shouldRefresh) {
+      // ✅ Clean the URL (remove ?refresh=true)
+      queryParams.delete('refresh');
+      navigate({ pathname: location.pathname, search: queryParams.toString() }, { replace: true });
+    }
+  }, [location.search, fetchMembers, navigate]);
+
 
   // Update filter when URL changes
   useEffect(() => {
@@ -158,9 +168,9 @@ export default function MembersList() {
             </SelectTrigger>
             <SelectContent className="bg-white p-1 rounded-[12px]">
               {filterOptions.map(option => (
-                <SelectItem 
-                  key={option.value} 
-                  value={option.value} 
+                <SelectItem
+                  key={option.value}
+                  value={option.value}
                   className="text-[16px] font-semibold"
                 >
                   {option.label}
@@ -180,9 +190,9 @@ export default function MembersList() {
         }
       />
 
-      <div className="w-full max-w-screen-md mx-auto px-4 py-6 my-16 mb-20 bg-white text-black">
+      <div className="w-full max-w-screen-md mx-auto px-4 py-2 my-16 mb-20 bg-white text-black">
         {/* Search Input */}
-        <div className="relative w-full max-w-sm mb-4">
+        <div className="relative w-full max-w-sm mb-3">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 h-4 w-4 pointer-events-none" />
           <Input {...searchInputProps} />
         </div>
@@ -192,7 +202,7 @@ export default function MembersList() {
           <div className="mb-4 text-sm text-gray-600">
             {search.trim() ? (
               <span>
-                Found {filteredMembers.length} result{filteredMembers.length !== 1 ? 's' : ''} 
+                Found {filteredMembers.length} result{filteredMembers.length !== 1 ? 's' : ''}
                 {filter !== 'all' && ` in ${filter} members`}
                 {search.trim() && ` for "${search.trim()}"`}
               </span>
@@ -222,32 +232,42 @@ export default function MembersList() {
 
         {/* No Results State */}
         {!loading && filteredMembers.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            {search.trim() ? (
-              <div>
-                <p className="text-lg font-medium mb-2">No members found</p>
-                <p className="text-sm">Try adjusting your search terms or filter</p>
-              </div>
-            ) : (
-              <div>
-                <p className="text-lg font-medium mb-2">No {filter} members</p>
-                <p className="text-sm">
-                  {filter === 'all' 
-                    ? 'Add your first member to get started'
-                    : `No ${filter} members found`
-                  }
-                </p>
-              </div>
-            )}
+          <div className="flex flex-col items-center justify-center text-center px-6 text-gray-500">
+            <img
+              src="/no-member.svg"
+              alt="No Members Illustration"
+              className="w-70 h-70 object-contain"
+              loading="lazy"
+            />
+            <h2 className="text-lg font-semibold text-black mb-1">No records yet.</h2>
+            <p className="text-medium w-[230px] text-gray-500 mb-6">
+              Add new members by clicking the “Add” button
+            </p>
+            <div className="flex gap-4">
+              <Button
+                onClick={handleAddMember}
+                className="gap-2 rounded-[10px] bg-white text-black border shadow-none"
+              >
+                <Plus className="w-4 h-4" />
+                Add
+              </Button>
+              <Button variant="outline"
+                onClick={() => navigate('/settings')}
+                className="rounded-[10px] border-0 shadow-none text-black">
+                Settings
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         )}
 
+
         {/* Member List */}
         {!loading && filteredMembers.length > 0 && (
-          <MemberList 
-            members={filteredMembers} 
-            filter={filter} 
-            search={search} 
+          <MemberList
+            members={filteredMembers}
+            filter={filter}
+            search={search}
             loading={loading}
           />
         )}

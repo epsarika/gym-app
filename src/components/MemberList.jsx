@@ -2,7 +2,6 @@
 import { useMemo, useCallback, memo, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, isAfter, isBefore } from 'date-fns';
-import md5 from 'md5';
 import { ChevronRight } from 'lucide-react';
 
 // Utility functions
@@ -11,15 +10,9 @@ const getInitials = (name) => {
   return nameParts.slice(0, 2).map((w) => w[0]).join('').toUpperCase();
 };
 
-const getGravatarUrl = (email) => {
-  if (!email?.trim()) return null;
-  return `https://www.gravatar.com/avatar/${md5(email.toLowerCase().trim())}?d=404`;
-};
-
 // Memoized individual member item component
 const MemberItem = memo(({ member, onClick, style }) => {
   const initials = useMemo(() => getInitials(member.name), [member.name]);
-  const gravatarUrl = useMemo(() => getGravatarUrl(member.email), [member.email]);
   
   const formattedDate = useMemo(() => {
     try {
@@ -29,10 +22,6 @@ const MemberItem = memo(({ member, onClick, style }) => {
       return 'Invalid Date';
     }
   }, [member.end_date]);
-
-  const handleImageError = useCallback((e) => {
-    e.target.style.display = 'none';
-  }, []);
 
   const handleClick = useCallback(() => {
     onClick(member.id);
@@ -46,15 +35,8 @@ const MemberItem = memo(({ member, onClick, style }) => {
     >
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center overflow-hidden text-sm md:text-base font-semibold text-gray-700">
-          {gravatarUrl ? (
-            <img
-              src={gravatarUrl}
-              alt={`${member.name} avatar`}
-              onError={handleImageError}
-              className="object-cover w-full h-full rounded-lg"
-              loading="lazy"
-            />
-          ) : (
+          
+          { (
             initials
           )}
         </div>
